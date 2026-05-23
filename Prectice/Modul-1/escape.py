@@ -1,0 +1,5 @@
+print('My name is \nGautamee')
+print('My name is"Gautamee"')
+print("My name is'gautamee'")
+print('\tMy name is Gautamee')
+print('My name\b is \bGautamee')
