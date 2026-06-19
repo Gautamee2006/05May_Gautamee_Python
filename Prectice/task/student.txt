@@ -1,3 +1,0 @@
-student name:gautamee
-student age:21
-student marks:400
