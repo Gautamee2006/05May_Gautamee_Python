@@ -1,17 +1,6 @@
-'''Build a script that reads all lines from my_fav_songs.txt, counts how many songs are listed,
- and displays 'Total songs: X' at the end.
-<br><br><em><strong>Hint:</strong> Use the readlines() method to get all lines as a list and len()
- to count.</em>'''
+'''Given the following traceback from a Python program, use ChatGPT to explain in your own words
+ what the error means and how you would fix it:<br><br>Traceback (most recent call last):<br> File 
+ "main.py", line 8, in <module><br> book_ticket('Avengers', -2)<br> File "main.py", line 4, 
+ in book_ticket<br> raise InvalidSeatNumberError('Seat number must be positive')
+ <br>NameError: name 'InvalidSeatNumberError' is not defined'''
 
-f=open("my_fav_songs.txt",'r')
-
-song=f.readlines()
-
-total=len(song)
-
-for i in song:
-    print(i.strip())
-
-print("total songs:",total)
-
-f.close()

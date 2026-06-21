@@ -1,13 +1,18 @@
-'''Add 2 more song names to my_fav_songs.txt without deleting the existing content,
- using Python's open() function in append ('a') mode.'''
+'''Simulate a Flipkart-style checkout process where a function process_payment(amount) 
+raises a PaymentFailedError (custom exception) if the amount is less than or equal to zero,
+ and prints 'Payment Successful' otherwise.'''
 
-f=open("my_fav_songs.txt","a")
+class PaymentFailedError(Exception):
+    pass
 
-#f.write("\nKesariya\nHeeriye")
-song1=input("enter song name:")
-song2=input("enter 2nd song name:")
-f.write(f"\n{song1}\n{song2}")
+def process_payment(amount):
+    try:
+        if amount<=0:
+             raise PaymentFailedError("payment not valid!")
+        else:
+            print("Payment Successful")
+    except PaymentFailedError as e:
+        print("ERROR:",e)
 
-print("song add successfuly")
-
-f.close()
+amount=int(input("enter Your Budget:"))
+process_payment(amount)
