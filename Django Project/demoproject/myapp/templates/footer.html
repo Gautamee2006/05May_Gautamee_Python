@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+footer{
+    background:#000;
+    color:#fff;
+    padding:40px 60px 20px;
+    border-top:2px solid #d4af37;
+}
+
+.footer-container{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    gap:40px;
+}
+
+/* Logo */
+
+.footer-logo h2{
+    color:#fff;
+    font-size:28px;
+}
+
+.footer-logo span{
+    color:#d4af37;
+}
+
+.footer-logo p{
+    margin-top:10px;
+    color:#bdbdbd;
+    font-size:14px;
+    line-height:22px;
+}
+
+/* Quick Links */
+
+.footer-links h3,
+.footer-contact h3{
+    color:#d4af37;
+    margin-bottom:15px;
+}
+
+.footer-links a{
+    display:block;
+    color:#fff;
+    text-decoration:none;
+    margin-bottom:10px;
+    transition:.3s;
+}
+
+.footer-links a:hover{
+    color:#d4af37;
+    padding-left:8px;
+}
+
+/* Contact */
+
+.footer-contact p{
+    margin-bottom:10px;
+    color:#ddd;
+}
+
+.footer-contact i{
+    color:#d4af37;
+    margin-right:10px;
+}
+
+/* Social Icons */
+
+.social-icons{
+    margin-top:15px;
+}
+
+.social-icons a{
+    display:inline-flex;
+    justify-content:center;
+    align-items:center;
+    width:40px;
+    height:40px;
+    border:1px solid #444;
+    border-radius:50%;
+    color:#fff;
+    text-decoration:none;
+    margin-right:10px;
+    transition:.3s;
+}
+
+.social-icons a:hover{
+    background:#d4af37;
+    color:#000;
+    transform:translateY(-4px);
+}
+
+/* Bottom */
+
+.footer-bottom{
+    border-top:1px solid #333;
+    margin-top:30px;
+    padding-top:15px;
+    text-align:center;
+    color:#aaa;
+    font-size:14px;
+}
+
+.footer-bottom span{
+    color:#d4af37;
+    font-weight:bold;
+}
+
+/* Responsive */
+
+@media(max-width:768px){
+
+.footer-container{
+    flex-direction:column;
+    text-align:center;
+}
+
+.social-icons{
+    justify-content:center;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<footer>
+
+<div class="footer-container">
+
+    <!-- Logo -->
+
+    <div class="footer-logo">
+        <h2><span>G</span>Craft</h2>
+        <p>
+            Beautiful Handmade Products<br>
+            Crafted with Love & Creativity.
+        </p>
+
+        <div class="social-icons">
+            <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="#"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+
+    <div class="footer-links">
+        <h3>Quick Links</h3>
+
+        <a href="#">Home</a>
+        <a href="#">Shop</a>
+        <a href="#">Categories</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+
+    </div>
+
+    <!-- Contact -->
+
+    <div class="footer-contact">
+
+        <h3>Contact Us</h3>
+
+        <p><i class="fa-solid fa-location-dot"></i>Rajkot, Gujarat</p>
+
+        <p><i class="fa-solid fa-phone"></i>+91 98765 43210</p>
+
+        <p><i class="fa-solid fa-envelope"></i>info@gcraft.com</p>
+
+    </div>
+
+</div>
+
+<div class="footer-bottom">
+    © 2026 <span>GCraft</span> | All Rights Reserved.
+</div>
+
+</footer>
+
+</body>
+</html>
