@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>Spotify Playlist</title>
+
+
+    <style>
+        body {
+
+            font-family: Arial;
+
+            background: #191414;
+
+            color: white;
+
+            padding: 40px;
+        }
+
+
+        .container {
+
+            width: 700px;
+
+            margin: auto;
+        }
+
+
+        .song {
+
+            background: #282828;
+
+            margin: 10px 0;
+
+            padding: 18px;
+
+            border-radius: 8px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+        }
+
+
+        .delete-btn {
+
+            background: #e22134;
+
+            color: white;
+
+            border: none;
+
+            padding: 9px 15px;
+
+            border-radius: 20px;
+
+            cursor: pointer;
+        }
+
+
+        .delete-btn:hover {
+
+            background: #b71929;
+        }
+
+
+        .success {
+
+            background: #1db954;
+
+            padding: 12px;
+
+            margin-bottom: 20px;
+
+            border-radius: 5px;
+
+            display: none;
+        }
+
+
+        .back {
+
+            color: #1db954;
+
+            text-decoration: none;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="container">
+
+
+        <h1>
+            🎵 My Spotify Playlist
+        </h1>
+
+
+        <div id="message" class="success"></div>
+
+
+        {% for song in songs %}
+
+        <div class="song" id="song-{{ song.id }}">
+
+            <div>
+
+                <strong>
+                    {{ song.name }}
+                </strong>
+
+                <br>
+
+                <small>
+                    {{ song.artist }}
+                </small>
+
+            </div>
+
+
+            <button class="delete-btn" data-song-id="{{ song.id }}" onclick="deleteSong(this)">
+                Delete
+            </button>
+        </div>
+
+        {% empty %}
+
+        <p>
+            No songs available.
+        </p>
+
+        {% endfor %}
+
+
+        <br>
+
+        <a href="{% url 'home' %}" class="back">
+
+            ← Back
+
+        </a>
+
+
+    </div>
+
+
+    <script>
+
+
+        function deleteSong(songId) {
+
+
+            fetch(
+                `/songs/${songId}/delete/`,
+                {
+                    method: 'DELETE',
+
+                    headers: {
+
+                        'X-CSRFToken': getCookie('csrftoken'),
+
+                    }
+                }
+            )
+
+
+                .then(response => response.json())
+
+
+                .then(data => {
+
+
+                    if (data.success) {
+
+
+                        // IMPORTANT:
+                        // Delete element from DOM
+
+                        const songElement =
+                            document.getElementById(
+                                `song-${songId}`
+                            );
+
+
+                        songElement.remove();
+
+
+                        showMessage(
+                            data.message
+                        );
+
+                    }
+
+                });
+
+
+        }
+
+
+        function showMessage(message) {
+
+            const messageBox =
+                document.getElementById('message');
+
+            messageBox.innerText = message;
+
+            messageBox.style.display = 'block';
+
+        }
+
+
+        function getCookie(name) {
+
+            let cookieValue = null;
+
+            if (document.cookie) {
+
+                const cookies =
+                    document.cookie.split(';');
+
+                for (let cookie of cookies) {
+
+                    cookie = cookie.trim();
+
+                    if (
+                        cookie.startsWith(name + '=')
+                    ) {
+
+                        cookieValue =
+                            decodeURIComponent(
+                                cookie.substring(
+                                    name.length + 1
+                                )
+                            );
+
+                        break;
+                    }
+                }
+            }
+
+            return cookieValue;
+        }
+
+
+    </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>Music Playlists</title>
+
+
+    <style>
+        body {
+
+            font-family: Arial;
+
+            background: #121212;
+
+            color: white;
+
+            padding: 40px;
+        }
+
+
+        .container {
+
+            width: 700px;
+
+            margin: auto;
+        }
+
+
+        .playlist {
+
+            background: #282828;
+
+            padding: 20px;
+
+            margin: 15px 0;
+
+            border-radius: 10px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+        }
+
+
+        .delete-btn {
+
+            background: #e22134;
+
+            color: white;
+
+            border: none;
+
+            padding: 10px 18px;
+
+            border-radius: 20px;
+
+            cursor: pointer;
+        }
+
+
+        #message {
+
+            display: none;
+
+            background: #1db954;
+
+            padding: 12px;
+
+            border-radius: 5px;
+
+            margin-bottom: 20px;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="container">
+
+
+        <h1>
+            🎧 My Playlists
+        </h1>
+
+
+        <div id="message"></div>
+
+
+        <div id="playlist-container">
+
+
+            {% for playlist in playlists %}
+
+
+            <div class="playlist" id="playlist-{{ playlist.id }}">
+
+                <strong>
+                    {{ playlist.name }}
+                </strong>
+
+
+                <button class="delete-btn" data-playlist-id="{{ playlist.id }}" onclick="deletePlaylist(this)">
+                    Delete
+                </button>
+
+            </div>
+
+
+            {% empty %}
+
+            <p>
+                No playlists available.
+            </p>
+
+            {% endfor %}
+
+
+        </div>
+
+
+        <br>
+
+
+        <a href="{% url 'home' %}">
+            ← Back
+        </a>
+
+
+    </div>
+
+
+    <script>
+
+
+        function deletePlaylist(playlistId) {
+
+
+            fetch(
+                `/playlists/${playlistId}/delete/`,
+                {
+
+                    method: 'DELETE',
+
+                    headers: {
+
+                        'X-CSRFToken':
+                            getCookie('csrftoken')
+
+                    }
+
+                }
+            )
+
+
+                .then(response => response.json())
+
+
+                .then(data => {
+
+
+                    if (data.success) {
+
+
+                        /*
+                         * IMPORTANT FIX
+                         *
+                         * Server par delete thayu
+                         * pachhi UI mathi pan element
+                         * remove karvu jaruri chhe.
+                         */
+
+
+                        const playlistElement =
+                            document.getElementById(
+                                `playlist-${playlistId}`
+                            );
+
+
+                        if (playlistElement) {
+
+                            playlistElement.remove();
+
+                        }
+
+
+                        showMessage(
+                            data.message
+                        );
+
+                    }
+
+                })
+
+
+                .catch(error => {
+
+                    console.log(
+                        'Error:',
+                        error
+                    );
+
+                });
+
+
+        }
+
+
+        function showMessage(message) {
+
+            const messageBox =
+                document.getElementById(
+                    'message'
+                );
+
+
+            messageBox.innerText = message;
+
+
+            messageBox.style.display =
+                'block';
+
+        }
+
+
+        function getCookie(name) {
+
+            let cookieValue = null;
+
+
+            if (document.cookie) {
+
+                const cookies =
+                    document.cookie.split(';');
+
+
+                for (let cookie of cookies) {
+
+                    cookie = cookie.trim();
+
+
+                    if (
+                        cookie.startsWith(
+                            name + '='
+                        )
+                    ) {
+
+                        cookieValue =
+                            decodeURIComponent(
+                                cookie.substring(
+                                    name.length + 1
+                                )
+                            );
+
+                        break;
+                    }
+                }
+            }
+
+
+            return cookieValue;
+        }
+
+
+    </script>
+
+
+</body>
+
+</html>

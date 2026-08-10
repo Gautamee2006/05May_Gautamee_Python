@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>Watch Later</title>
+
+
+    <style>
+        body {
+
+            font-family: Arial;
+
+            background: #f5f5f5;
+
+            padding: 40px;
+        }
+
+
+        .container {
+
+            width: 800px;
+
+            margin: auto;
+        }
+
+
+        h1 {
+
+            text-align: center;
+
+            color: #333;
+        }
+
+
+        .movie {
+
+            background: white;
+
+            padding: 20px;
+
+            margin: 15px 0;
+
+            border-radius: 10px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            box-shadow: 0 2px 8px #ddd;
+        }
+
+
+        .delete-btn {
+
+            background: #e50914;
+
+            color: white;
+
+            border: none;
+
+            padding: 10px 18px;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+        }
+
+
+        .message {
+
+            display: none;
+
+            background: #28a745;
+
+            color: white;
+
+            padding: 15px;
+
+            margin-bottom: 20px;
+
+            text-align: center;
+
+            border-radius: 5px;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="container">
+
+
+        <h1>
+            🎬 My Watch Later
+        </h1>
+
+
+        <div id="message" class="message"></div>
+
+
+        {% for movie in movies %}
+
+
+        <div class="movie" id="movie-{{ movie.id }}">
+
+            <div>
+
+                <h2>
+                    {{ movie.name }}
+                </h2>
+
+                <p>
+                    {{ movie.genre }}
+                </p>
+
+            </div>
+
+
+            <button class="delete-btn" data-movie-id="{{ movie.id }}" onclick="removeMovie(this)">
+                Remove
+            </button>
+
+        </div>
+
+
+        {% empty %}
+
+        <p>
+            No movies in Watch Later.
+        </p>
+
+        {% endfor %}
+
+
+        <br>
+
+
+        <a href="{% url 'home' %}">
+            ← Back
+        </a>
+
+
+    </div>
+
+
+    <script>
+
+
+        function removeMovie(movieId) {
+
+
+            fetch(
+                `/movies/${movieId}/delete/`,
+                {
+
+                    method: 'DELETE',
+
+                    headers: {
+
+                        'Content-Type':
+                            'application/json',
+
+                        'X-CSRFToken':
+                            getCookie('csrftoken')
+
+                    },
+
+
+                    body: JSON.stringify({
+
+                        movie_id: movieId
+
+                    })
+
+                }
+            )
+
+
+                .then(response => response.json())
+
+
+                .then(data => {
+
+
+                    if (data.success) {
+
+
+                        const movie =
+                            document.getElementById(
+                                `movie-${movieId}`
+                            );
+
+
+                        // Remove movie from UI
+
+                        movie.remove();
+
+
+                        // Dynamic success message
+
+                        showMessage(
+                            data.message
+                        );
+
+                    }
+
+                });
+
+
+        }
+
+
+        function showMessage(message) {
+
+            const box =
+                document.getElementById('message');
+
+            box.innerText = message;
+
+            box.style.display = 'block';
+
+        }
+
+
+        function getCookie(name) {
+
+            let cookieValue = null;
+
+
+            if (document.cookie) {
+
+                const cookies =
+                    document.cookie.split(';');
+
+
+                for (let cookie of cookies) {
+
+                    cookie = cookie.trim();
+
+
+                    if (
+                        cookie.startsWith(
+                            name + '='
+                        )
+                    ) {
+
+                        cookieValue =
+                            decodeURIComponent(
+                                cookie.substring(
+                                    name.length + 1
+                                )
+                            );
+
+                        break;
+                    }
+                }
+            }
+
+
+            return cookieValue;
+        }
+
+
+    </script>
+
+
+</body>
+
+</html>

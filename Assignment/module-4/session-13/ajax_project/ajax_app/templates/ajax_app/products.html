@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>Product Wishlist</title>
+
+
+    <style>
+        body {
+
+            font-family: Arial;
+
+            background: #f1f3f6;
+
+            padding: 40px;
+        }
+
+
+        .container {
+
+            width: 800px;
+
+            margin: auto;
+        }
+
+
+        h1 {
+
+            text-align: center;
+        }
+
+
+        .product {
+
+            background: white;
+
+            padding: 20px;
+
+            margin: 15px 0;
+
+            border-radius: 10px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            box-shadow: 0 2px 5px #ddd;
+        }
+
+
+        .price {
+
+            color: #388e3c;
+
+            font-weight: bold;
+        }
+
+
+        .remove-btn {
+
+            background: #ff6161;
+
+            color: white;
+
+            border: none;
+
+            padding: 10px 15px;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+        }
+
+
+        .message {
+
+            background: #28a745;
+
+            color: white;
+
+            padding: 12px;
+
+            border-radius: 5px;
+
+            display: none;
+
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="container">
+
+
+        <h1>
+            🛒 My Wishlist
+        </h1>
+
+
+        <div id="message" class="message"></div>
+
+
+        <div id="product-list">
+
+
+            {% for product in products %}
+
+
+            <div class="product" id="product-{{ product.id }}">
+
+                <div>
+
+                    <h3>
+                        {{ product.name }}
+                    </h3>
+
+                    <span class="price">
+
+                        ₹{{ product.price }}
+
+                    </span>
+
+                </div>
+
+
+                <button class="remove-btn" data-product-id="{{ product.id }}" onclick="removeProduct(this)">
+                    Remove from Wishlist
+                </button>
+
+            </div>
+
+
+            {% empty %}
+
+            <p>
+                Wishlist is empty.
+            </p>
+
+            {% endfor %}
+
+
+        </div>
+
+
+        <br>
+
+        <a href="{% url 'home' %}">
+            ← Back
+        </a>
+
+
+    </div>
+
+
+    <script>
+
+
+        function removeProduct(productId) {
+
+
+            fetch(
+                `/products/${productId}/delete/`,
+                {
+
+                    method: 'DELETE',
+
+                    headers: {
+
+                        'X-CSRFToken':
+                            getCookie('csrftoken'),
+
+                    }
+
+                }
+            )
+
+
+                .then(response => response.json())
+
+
+                .then(data => {
+
+
+                    if (data.success) {
+
+
+                        const product =
+                            document.getElementById(
+                                `product-${productId}`
+                            );
+
+
+                        // Remove from UI
+
+                        product.remove();
+
+
+                        showMessage(
+                            data.message
+                        );
+
+                    }
+
+                });
+
+
+        }
+
+
+        function showMessage(message) {
+
+            const box =
+                document.getElementById('message');
+
+            box.innerText = message;
+
+            box.style.display = 'block';
+
+        }
+
+
+        function getCookie(name) {
+
+            let value = null;
+
+            const cookies =
+                document.cookie.split(';');
+
+
+            for (let cookie of cookies) {
+
+                cookie = cookie.trim();
+
+
+                if (
+                    cookie.startsWith(name + '=')
+                ) {
+
+                    value =
+                        decodeURIComponent(
+                            cookie.substring(
+                                name.length + 1
+                            )
+                        );
+
+                    break;
+                }
+            }
+
+
+            return value;
+        }
+
+
+    </script>
+
+
+</body>
+
+</html>
