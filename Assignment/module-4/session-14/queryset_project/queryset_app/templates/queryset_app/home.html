@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>Django QuerySet Assignment</title>
+
+
+    <style>
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            background: #f5f5f5;
+
+            margin: 0;
+
+            padding: 40px;
+        }
+
+
+        .container {
+
+            width: 900px;
+
+            max-width: 95%;
+
+            margin: auto;
+
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+            box-shadow: 0 3px 15px #ddd;
+        }
+
+
+        h1 {
+
+            text-align: center;
+
+            margin-bottom: 30px;
+        }
+
+
+        .links {
+
+            display: flex;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+
+            margin-bottom: 30px;
+        }
+
+
+        .links a {
+
+            background: #2874f0;
+
+            color: white;
+
+            padding: 12px 18px;
+
+            text-decoration: none;
+
+            border-radius: 6px;
+        }
+
+
+        .links a:hover {
+
+            background: #1257b8;
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            margin-top: 20px;
+        }
+
+
+        th,
+        td {
+
+            border: 1px solid #ddd;
+
+            padding: 12px;
+
+            text-align: left;
+        }
+
+
+        th {
+
+            background: #2874f0;
+
+            color: white;
+        }
+
+
+        tr:nth-child(even) {
+
+            background: #f8f8f8;
+        }
+
+
+        .product {
+
+            border: 1px solid #ddd;
+
+            padding: 15px;
+
+            margin: 10px 0;
+
+            border-radius: 8px;
+        }
+
+
+        .pagination {
+
+            margin-top: 25px;
+
+            text-align: center;
+        }
+
+
+        .pagination a {
+
+            display: inline-block;
+
+            padding: 8px 14px;
+
+            margin: 3px;
+
+            background: #2874f0;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 5px;
+        }
+
+
+        .current {
+
+            display: inline-block;
+
+            padding: 8px 14px;
+
+            background: #ddd;
+
+            border-radius: 5px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <h1>
+        Django QuerySet Assignment
+    </h1>
+
+
+    <div class="links">
+
+        <a href="{% url 'home' %}">
+            Home
+        </a>
+
+        <a href="{% url 'restaurant_filter' %}">
+            Chinese Restaurants
+        </a>
+
+        <a href="{% url 'product_list' %}">
+            Products
+        </a>
+
+    </div>
+
+
+    {% if task == 'Restaurant Filter' %}
+
+
+        <h2>
+            Chinese Restaurants with Rating > 4
+        </h2>
+
+
+        <table>
+
+            <tr>
+
+                <th>
+                    Name
+                </th>
+
+                <th>
+                    Cuisine
+                </th>
+
+                <th>
+                    Rating
+                </th>
+
+            </tr>
+
+
+            {% for restaurant in restaurants %}
+
+            <tr>
+
+                <td>
+                    {{ restaurant.name }}
+                </td>
+
+                <td>
+                    {{ restaurant.cuisine }}
+                </td>
+
+                <td>
+                    {{ restaurant.rating }}
+                </td>
+
+            </tr>
+
+            {% empty %}
+
+            <tr>
+
+                <td colspan="3">
+                    No restaurants found.
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+
+    {% elif task == 'Product Filter' %}
+
+
+        <h2>
+            Products
+        </h2>
+
+
+        {% for product in products %}
+
+
+        <div class="product">
+
+            <strong>
+                {{ product.name }}
+            </strong>
+
+            <br>
+
+            Price:
+            ₹{{ product.price }}
+
+            <br>
+
+            Category:
+            {{ product.category.name }}
+
+        </div>
+
+
+        {% empty %}
+
+        <p>
+            No products found.
+        </p>
+
+        {% endfor %}
+
+
+        {% if page_obj %}
+
+        <div class="pagination">
+
+
+            {% if page_obj.has_previous %}
+
+                <a href="?page=1">
+                    First
+                </a>
+
+                <a
+                    href="?page={{ page_obj.previous_page_number }}"
+                >
+                    Previous
+                </a>
+
+            {% endif %}
+
+
+            <span class="current">
+
+                Page
+                {{ page_obj.number }}
+                of
+                {{ page_obj.paginator.num_pages }}
+
+            </span>
+
+
+            {% if page_obj.has_next %}
+
+                <a
+                    href="?page={{ page_obj.next_page_number }}"
+                >
+                    Next
+                </a>
+
+                <a
+                    href="?page={{ page_obj.paginator.num_pages }}"
+                >
+                    Last
+                </a>
+
+            {% endif %}
+
+
+        </div>
+
+        {% endif %}
+
+
+    {% else %}
+
+
+        <h2>
+            Tasks
+        </h2>
+
+
+        <ol>
+
+            <li>
+                Restaurant filter using filter()
+            </li>
+
+            <li>
+                User filtering using exclude()
+            </li>
+
+            <li>
+                Movie review count using annotate()
+            </li>
+
+            <li>
+                Product category using select_related()
+            </li>
+
+            <li>
+                Product filtering using Q() and Paginator
+            </li>
+
+        </ol>
+
+
+    {% endif %}
+
+
+</div>
+
+
+</body>
+
+</html>
