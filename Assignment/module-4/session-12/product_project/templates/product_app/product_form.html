@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>{{ title }}</title>
+
+
+    <style>
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            background: #f1f3f6;
+
+            margin: 0;
+        }
+
+
+        .header {
+
+            background: #2874f0;
+
+            color: white;
+
+            padding: 18px;
+
+            text-align: center;
+
+            font-size: 25px;
+
+            font-weight: bold;
+        }
+
+
+        .form-container {
+
+            width: 450px;
+
+            margin: 50px auto;
+
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 10px;
+
+            box-shadow: 0 0 10px #ddd;
+        }
+
+
+        h2 {
+
+            text-align: center;
+
+            margin-bottom: 25px;
+        }
+
+
+        label {
+
+            display: block;
+
+            margin-top: 15px;
+
+            margin-bottom: 5px;
+
+            font-weight: bold;
+        }
+
+
+        input {
+
+            width: 100%;
+
+            padding: 11px;
+
+            box-sizing: border-box;
+
+            border: 1px solid #ccc;
+
+            border-radius: 5px;
+        }
+
+
+        .errorlist {
+
+            color: red;
+
+            list-style: none;
+
+            padding: 0;
+        }
+
+
+        .save-btn {
+
+            width: 100%;
+
+            margin-top: 20px;
+
+            padding: 12px;
+
+            background: #2874f0;
+
+            color: white;
+
+            border: none;
+
+            border-radius: 5px;
+
+            font-size: 16px;
+
+            cursor: pointer;
+        }
+
+
+        .save-btn:hover {
+
+            background: #1557b0;
+        }
+
+
+        .back-btn {
+
+            display: block;
+
+            text-align: center;
+
+            margin-top: 15px;
+
+            text-decoration: none;
+
+            color: #2874f0;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+    🛒 Flipkart Product Management
+
+</div>
+
+
+<div class="form-container">
+
+
+    <h2>
+
+        {{ title }}
+
+    </h2>
+
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+
+        {{ form.non_field_errors }}
+
+
+        <label>
+            Product Name
+        </label>
+
+        {{ form.name }}
+
+        {{ form.name.errors }}
+
+
+        <label>
+            Price
+        </label>
+
+        {{ form.price }}
+
+        {{ form.price.errors }}
+
+
+        <label>
+            Category
+        </label>
+
+        {{ form.category }}
+
+        {{ form.category.errors }}
+
+
+        <button
+            type="submit"
+            class="save-btn"
+        >
+
+            Save Product
+
+        </button>
+
+
+    </form>
+
+
+    <a
+        href="{% url 'product_list' %}"
+        class="back-btn"
+    >
+
+        ← Back to Products
+
+    </a>
+
+
+</div>
+
+
+</body>
+
+</html>

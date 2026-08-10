@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>Flipkart Product List</title>
+
+
+    <style>
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            background: #f1f3f6;
+
+            margin: 0;
+
+            padding: 0;
+        }
+
+
+        .header {
+
+            background: #2874f0;
+
+            color: white;
+
+            padding: 18px;
+
+            text-align: center;
+
+            font-size: 25px;
+
+            font-weight: bold;
+        }
+
+
+        .container {
+
+            width: 90%;
+
+            max-width: 1000px;
+
+            margin: 40px auto;
+
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 10px;
+
+            box-shadow: 0 0 10px #ddd;
+        }
+
+
+        .add-btn {
+
+            display: inline-block;
+
+            background: #ff9f00;
+
+            color: white;
+
+            padding: 10px 18px;
+
+            text-decoration: none;
+
+            border-radius: 5px;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .add-btn:hover {
+
+            background: #e68a00;
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+        }
+
+
+        th {
+
+            background: #2874f0;
+
+            color: white;
+
+            padding: 14px;
+
+            text-align: left;
+        }
+
+
+        td {
+
+            padding: 14px;
+
+            border-bottom: 1px solid #ddd;
+        }
+
+
+        tr:hover {
+
+            background: #f9f9f9;
+        }
+
+
+        .edit-btn {
+
+            background: #28a745;
+
+            color: white;
+
+            padding: 7px 12px;
+
+            text-decoration: none;
+
+            border-radius: 4px;
+
+            margin-right: 5px;
+        }
+
+
+        .delete-btn {
+
+            background: #dc3545;
+
+            color: white;
+
+            padding: 7px 12px;
+
+            text-decoration: none;
+
+            border-radius: 4px;
+        }
+
+
+        .empty {
+
+            text-align: center;
+
+            padding: 30px;
+
+            color: #777;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+    🛒 Flipkart Product Management
+
+</div>
+
+
+<div class="container">
+
+
+    <a
+        href="{% url 'product_create' %}"
+        class="add-btn"
+    >
+
+        + Add Product
+
+    </a>
+
+
+    {% if products %}
+
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    Product Name
+                </th>
+
+                <th>
+                    Price
+                </th>
+
+                <th>
+                    Category
+                </th>
+
+                <th>
+                    Actions
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+
+        {% for product in products %}
+
+
+            <tr>
+
+                <td>
+
+                    {{ product.name }}
+
+                </td>
+
+
+                <td>
+
+                    ₹{{ product.price }}
+
+                </td>
+
+
+                <td>
+
+                    {{ product.category }}
+
+                </td>
+
+
+                <td>
+
+                    <a
+                        href="{% url 'product_edit' product.id %}"
+                        class="edit-btn"
+                    >
+
+                        Edit
+
+                    </a>
+
+
+                    <a
+                        href="{% url 'product_delete' product.id %}"
+                        class="delete-btn"
+                    >
+
+                        Delete
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+
+        {% endfor %}
+
+
+        </tbody>
+
+    </table>
+
+
+    {% else %}
+
+
+        <div class="empty">
+
+            <h3>
+                No products found.
+            </h3>
+
+            <p>
+                Click "Add Product" to create your first product.
+            </p>
+
+        </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+</body>
+
+</html>
