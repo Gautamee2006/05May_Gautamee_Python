@@ -1,0 +1,55 @@
+{% extends 'role_app/base.html' %}
+
+{% block title %}Movie Reviews - RoleAuth{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+            <h1 style="font-size: 1.8rem; font-weight: 700;">Movie Reviews</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Community ratings and critic reviews</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+            <a href="{% url 'movie_list' %}" class="btn btn-secondary">View Movies</a>
+            {% if can_add_review %}
+                <a href="{% url 'add_review' %}" class="btn btn-primary">+ Add Review</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if reviews %}
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for r in reviews %}
+                <div class="card card-hover" style="padding: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <div>
+                            <h3 style="font-size: 1.2rem; font-weight: 600;">{{ r.movie.title }}</h3>
+                            <span style="color: var(--text-muted); font-size: 0.85rem;">Reviewed by <strong>{{ r.user.username }}</strong> on {{ r.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-size: 0.9rem; padding: 0.35rem 0.7rem;">
+                                ★ {{ r.rating }}/5
+                            </span>
+                            {% if can_change_review %}
+                                <a href="{% url 'edit_review' r.id %}" class="btn btn-secondary" style="padding: 0.25rem 0.65rem; font-size: 0.8rem;">Edit</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <p style="color: var(--text-main); font-size: 0.95rem; line-height: 1.5; margin-top: 0.75rem; background: rgba(15, 23, 42, 0.4); padding: 0.85rem; border-radius: 8px; border-left: 3px solid var(--accent-primary);">
+                        "{{ r.comment }}"
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card" style="text-align: center; padding: 3rem 1rem;">
+            <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1rem;">
+                No reviews have been published yet.
+            </p>
+            {% if can_add_review %}
+                <a href="{% url 'add_review' %}" class="btn btn-primary">Write First Review</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

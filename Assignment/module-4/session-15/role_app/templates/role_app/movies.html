@@ -1,0 +1,48 @@
+{% extends 'role_app/base.html' %}
+
+{% block title %}Movies - RoleAuth{% endblock %}
+
+{% block content %}
+<div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+            <h1 style="font-size: 1.8rem; font-weight: 700;">Movie Catalogue</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Browse movies available for criticism and fan reviews</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+            <a href="{% url 'review_list' %}" class="btn btn-secondary">View Reviews</a>
+            {% if can_add_review %}
+                <a href="{% url 'add_review' %}" class="btn btn-primary">+ Add Review</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if movies %}
+        <div class="grid-2">
+            {% for m in movies %}
+                <div class="card card-hover">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                        <h3 style="font-size: 1.3rem; font-weight: 600;">{{ m.title }}</h3>
+                        <span class="badge" style="background: rgba(99, 102, 241, 0.2); color: #818cf8;">Released: {{ m.release_date|date:"Y" }}</span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
+                        {{ m.description }}
+                    </p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">Release Date: {{ m.release_date|date:"F d, Y" }}</span>
+                        {% if can_add_review %}
+                            <a href="{% url 'add_review' %}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">Write Review</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card" style="text-align: center; padding: 3rem 1rem;">
+            <p style="color: var(--text-muted); font-size: 1.1rem;">
+                No movies currently listed in the database.
+            </p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

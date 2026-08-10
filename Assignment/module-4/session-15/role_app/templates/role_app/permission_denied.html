@@ -1,0 +1,29 @@
+{% extends 'role_app/base.html' %}
+
+{% block title %}403 Permission Denied - RoleAuth{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 4rem auto; text-align: center;">
+    <div class="card" style="padding: 3rem 2rem; border-top: 4px solid var(--accent-danger);">
+        <div style="font-size: 3.5rem; line-height: 1; margin-bottom: 1rem;">🚫</div>
+        <h1 style="font-size: 2rem; font-weight: 700; color: var(--accent-danger); margin-bottom: 0.75rem;">
+            Permission Denied
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 2rem;">
+            You do not have permission to access this page.
+        </p>
+
+        <div style="display: flex; justify-content: center; gap: 1rem;">
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">
+                    Back to Dashboard &rarr;
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">
+                    Sign In to Continue &rarr;
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'role_app/base.html' %}
+
+{% block title %}Playlist Admin Panel - RoleAuth{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h1 style="font-size: 1.8rem; font-weight: 700;">Playlist Admin</h1>
+                <span class="badge badge-admin">Admin Group Only</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Administrative overview of user playlists</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">&larr; Back to Dashboard</a>
+    </div>
+
+    <div class="card">
+        {% if playlists %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Playlist Name</th>
+                        <th>Description</th>
+                        <th>Created By</th>
+                        <th>Date Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pl in playlists %}
+                        <tr>
+                            <td style="font-weight: 600; color: var(--accent-primary);">#{{ pl.id }}</td>
+                            <td style="font-weight: 600;">{{ pl.name }}</td>
+                            <td style="color: var(--text-muted); font-size: 0.9rem;">{{ pl.description }}</td>
+                            <td><strong>{{ pl.created_by.username }}</strong></td>
+                            <td style="color: var(--text-muted); font-size: 0.85rem;">{{ pl.created_at|date:"Y-m-d H:i" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div style="text-align: center; padding: 2.5rem 1rem;">
+                <p style="color: var(--text-muted); font-size: 1.1rem;">
+                    No playlists have been created in the system yet.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

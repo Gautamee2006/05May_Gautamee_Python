@@ -1,0 +1,192 @@
+{% extends 'role_app/base.html' %}
+
+{% block title %}Dashboard - RoleAuth{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="font-size: 2rem; font-weight: 700;">Welcome, {{ user.username }}!</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">
+                Here is your role-specific dashboard context.
+            </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            {% for g in user_groups %}
+                {% if g == 'Seller' %}
+                    <span class="badge badge-seller">Seller</span>
+                {% elif g == 'Buyer' %}
+                    <span class="badge badge-buyer">Buyer</span>
+                {% elif g == 'MovieCritic' %}
+                    <span class="badge badge-critic">MovieCritic</span>
+                {% elif g == 'MovieFan' %}
+                    <span class="badge badge-fan">MovieFan</span>
+                {% elif g == 'Admin' %}
+                    <span class="badge badge-admin">Admin</span>
+                {% else %}
+                    <span class="badge" style="background: rgba(255,255,255,0.1); color: #fff;">{{ g }}</span>
+                {% endif %}
+            {% endfor %}
+            {% if user.is_superuser %}
+                <span class="badge badge-admin">Superuser</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if has_no_role %}
+    <!-- User has no assigned group role -->
+    <div class="card" style="border-left: 4px solid var(--accent-warning); padding: 2rem;">
+        <h2 style="font-size: 1.3rem; color: var(--accent-warning); margin-bottom: 0.5rem;">Role Assignment Pending</h2>
+        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1rem;">
+            Your account has no assigned role. Please contact the administrator.
+        </p>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">
+            Administrators can assign roles (Seller, Buyer, MovieCritic, MovieFan, Admin) via Django Admin or management tools.
+        </p>
+    </div>
+{% endif %}
+
+{% if is_seller %}
+    <!-- SELLER DASHBOARD -->
+    <div style="margin-bottom: 2.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h2 style="font-size: 1.4rem; font-weight: 600;">Seller Command Center</h2>
+            <a href="{% url 'post_product' %}" class="btn btn-primary">+ Post Product</a>
+        </div>
+
+        <div class="grid-3" style="margin-bottom: 2rem;">
+            <div class="card">
+                <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500; text-transform: uppercase;">Total Active Products</span>
+                <div style="font-size: 2.2rem; font-weight: 700; color: var(--accent-primary); margin-top: 0.25rem;">{{ product_count }}</div>
+            </div>
+
+            <div class="card">
+                <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500; text-transform: uppercase;">Seller Status</span>
+                <div style="font-size: 1.2rem; font-weight: 600; color: var(--accent-success); margin-top: 0.5rem;">Active Verified Seller</div>
+            </div>
+
+            <div class="card">
+                <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500; text-transform: uppercase;">Quick Actions</span>
+                <div style="margin-top: 0.75rem;">
+                    <a href="{% url 'product_list' %}" class="btn btn-secondary" style="width: 100%; font-size: 0.85rem;">Manage Products</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="font-size: 1.15rem; margin-bottom: 1rem;">Recent Products Posted by You</h3>
+            {% if recent_products %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Price</th>
+                            <th>Date Added</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in recent_products %}
+                            <tr>
+                                <td style="font-weight: 600;">{{ p.name }}</td>
+                                <td style="color: var(--accent-success); font-weight: 600;">${{ p.price }}</td>
+                                <td style="color: var(--text-muted);">{{ p.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'product_list' %}" class="btn btn-secondary" style="padding: 0.25rem 0.6rem; font-size: 0.8rem;">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="color: var(--text-muted); font-size: 0.9rem;">You have not posted any products yet. Click 'Post Product' to get started!</p>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+
+{% if is_buyer %}
+    <!-- BUYER DASHBOARD -->
+    <div style="margin-bottom: 2.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h2 style="font-size: 1.4rem; font-weight: 600;">Buyer Overview</h2>
+            <a href="{% url 'my_orders' %}" class="btn btn-primary">My Orders History</a>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 2rem;">
+            <div class="card">
+                <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500; text-transform: uppercase;">Total Orders Placed</span>
+                <div style="font-size: 2.2rem; font-weight: 700; color: var(--accent-secondary); margin-top: 0.25rem;">{{ order_count }}</div>
+            </div>
+
+            <div class="card">
+                <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500; text-transform: uppercase;">Browse Marketplace</span>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0.5rem 0;">Explore products posted by verified sellers.</p>
+                <a href="{% url 'product_list' %}" class="btn btn-secondary" style="font-size: 0.85rem;">View Products Marketplace &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.15rem; margin-bottom: 1rem;">Available Products</h3>
+            {% if available_products %}
+                <div class="grid-3">
+                    {% for prod in available_products %}
+                        <div style="background: rgba(15, 23, 42, 0.6); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <h4 style="font-size: 1rem; font-weight: 600;">{{ prod.name }}</h4>
+                                <p style="color: var(--accent-success); font-weight: 700; margin: 0.25rem 0;">${{ prod.price }}</p>
+                                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.75rem;">Seller: {{ prod.seller.username }}</p>
+                            </div>
+                            <form method="post" action="{% url 'buy_product' prod.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.4rem; font-size: 0.8rem;">
+                                    🛒 Buy Now
+                                </button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: var(--text-muted); font-size: 0.9rem;">No products currently available in marketplace.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+
+{% if is_critic or is_fan %}
+    <!-- MOVIE COMMUNITY DASHBOARD -->
+    <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem;">Movie Community Section</h2>
+        <div class="grid-2">
+            <div class="card">
+                <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Movie Catalogue</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Explore titles, release dates, and descriptions.</p>
+                <a href="{% url 'movie_list' %}" class="btn btn-secondary">View Movies</a>
+            </div>
+
+            <div class="card">
+                <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Movie Reviews</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Read community ratings and critic insights.</p>
+                <div style="display: flex; gap: 0.5rem;">
+                    <a href="{% url 'review_list' %}" class="btn btn-secondary">View Reviews</a>
+                    {% if is_critic %}
+                        <a href="{% url 'add_review' %}" class="btn btn-primary">+ Add Review</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{% if is_admin %}
+    <!-- ADMIN DASHBOARD -->
+    <div class="card" style="border: 1px solid rgba(239, 68, 68, 0.4); margin-bottom: 2rem;">
+        <h2 style="font-size: 1.3rem; color: #f87171; margin-bottom: 0.5rem;">Admin Group Permissions</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;">
+            As a member of the 'Admin' group, you have explicit permission to access Playlist administration.
+        </p>
+        <a href="{% url 'playlist_admin' %}" class="btn btn-primary" style="background: var(--accent-danger);">Access Playlist Admin &rarr;</a>
+    </div>
+{% endif %}
+{% endblock %}

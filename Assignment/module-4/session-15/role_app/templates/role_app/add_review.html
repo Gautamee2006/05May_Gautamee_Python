@@ -1,0 +1,50 @@
+{% extends 'role_app/base.html' %}
+
+{% block title %}Write Review - RoleAuth{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 1.5rem auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+            <h1 style="font-size: 1.8rem; font-weight: 700;">Add Movie Review</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">MovieCritic Authorization Verified</p>
+        </div>
+        <a href="{% url 'review_list' %}" class="btn btn-secondary">&larr; Back to Reviews</a>
+    </div>
+
+    <div class="card">
+        <form method="post" action="{% url 'add_review' %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.movie.id_for_label }}">Select Movie</label>
+                {{ form.movie }}
+                {% if form.movie.errors %}
+                    <div style="color: var(--accent-danger); font-size: 0.85rem; margin-top: 0.25rem;">{{ form.movie.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.rating.id_for_label }}">Rating (1 to 5)</label>
+                {{ form.rating }}
+                {% if form.rating.errors %}
+                    <div style="color: var(--accent-danger); font-size: 0.85rem; margin-top: 0.25rem;">{{ form.rating.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.comment.id_for_label }}">Review Comment</label>
+                {{ form.comment }}
+                {% if form.comment.errors %}
+                    <div style="color: var(--accent-danger); font-size: 0.85rem; margin-top: 0.25rem;">{{ form.comment.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Publish Review &rarr;</button>
+                <a href="{% url 'review_list' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

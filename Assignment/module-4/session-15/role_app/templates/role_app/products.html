@@ -1,0 +1,54 @@
+{% extends 'role_app/base.html' %}
+
+{% block title %}Products Catalogue - RoleAuth{% endblock %}
+
+{% block content %}
+<div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+            <h1 style="font-size: 1.8rem; font-weight: 700;">Products Catalogue</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Browse products listed by active Sellers</p>
+        </div>
+        {% if perms.role_app.add_product %}
+            <a href="{% url 'post_product' %}" class="btn btn-primary">+ Post Product</a>
+        {% endif %}
+    </div>
+
+    {% if products %}
+        <div class="grid-3">
+            {% for p in products %}
+                <div class="card card-hover">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                        <h3 style="font-size: 1.2rem; font-weight: 600;">{{ p.name }}</h3>
+                        <span style="font-size: 1.25rem; font-weight: 700; color: var(--accent-success);">${{ p.price }}</span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; flex: 1;">
+                        {{ p.description }}
+                    </p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                        <span>Seller: <strong>{{ p.seller.username }}</strong></span>
+                        <span>{{ p.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    {% if can_buy_product %}
+                        <form method="post" action="{% url 'buy_product' p.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.45rem; font-size: 0.85rem;">
+                                🛒 Buy Now (${{ p.price }})
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card" style="text-align: center; padding: 3rem 1rem;">
+            <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1rem;">
+                No products are currently available in the marketplace.
+            </p>
+            {% if perms.role_app.add_product %}
+                <a href="{% url 'post_product' %}" class="btn btn-primary">Post First Product</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
