@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Flask Payment Integration — Home{% endblock %}
+
+{% block content %}
+<div class="card" style="text-align: center;">
+    <h1 class="card-title">Flask Payment Gateway Integrations</h1>
+    <p class="card-subtitle">Select a payment flow below to test dynamic multi-gateway sandbox processing.</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+        
+        <!-- Task 1 & 2: Paytm Sandbox -->
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 1.5rem; text-align: left; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <span class="badge" style="background: rgba(0, 186, 242, 0.2); color: #38bdf8; margin-bottom: 1rem;">Task 1 & 2 & 3</span>
+                <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--text-primary);">IPL Ticket — Paytm</h2>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Paytm Sandbox payment gateway integration with dynamic checksum hash signature verification.</p>
+            </div>
+            <a href="{{ url_for('pay') }}" class="btn btn-paytm">
+                IPL Ticket → Paytm
+            </a>
+        </div>
+
+        <!-- Task 4: Stripe Test -->
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 1.5rem; text-align: left; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <span class="badge" style="background: rgba(99, 91, 255, 0.2); color: #a5b4fc; margin-bottom: 1rem;">Task 4</span>
+                <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--text-primary);">Food Order — Stripe</h2>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Zomato-style dynamic food order payment using Stripe Checkout Test Mode API.</p>
+            </div>
+            <a href="{{ url_for('food_payment') }}" class="btn btn-stripe">
+                Food Order → Stripe
+            </a>
+        </div>
+
+        <!-- Task 5: PayPal Sandbox -->
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 1.5rem; text-align: left; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <span class="badge" style="background: rgba(0, 112, 186, 0.2); color: #60a5fa; margin-bottom: 1rem;">Task 5</span>
+                <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--text-primary);">IPL Ticket — PayPal</h2>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">PayPal Sandbox REST API v2 order creation and payment capture processing.</p>
+            </div>
+            <a href="{{ url_for('paypal_pay') }}" class="btn btn-paypal">
+                IPL Ticket → PayPal
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

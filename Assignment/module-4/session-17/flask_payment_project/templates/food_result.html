@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Stripe Food Payment Result{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        {% if status == 'paid' or status == 'SUCCESS' %}
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">🍕</div>
+            <span class="badge badge-success" id="food-status-badge">FOOD PAYMENT SUCCESSFUL</span>
+            <h1 class="card-title" style="margin-top: 1rem;">Order Placed!</h1>
+            <p class="card-subtitle">Your food order has been confirmed via Stripe Test Checkout.</p>
+        {% else %}
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">🚫</div>
+            <span class="badge badge-cancelled" id="food-status-badge">FOOD PAYMENT CANCELLED</span>
+            <h1 class="card-title" style="margin-top: 1rem;">Order Cancelled</h1>
+            <p class="card-subtitle">The Stripe checkout session was cancelled or incomplete.</p>
+        {% endif %}
+    </div>
+
+    <table class="detail-table">
+        <tbody>
+            <tr>
+                <td>Payment Status</td>
+                <td>
+                    {% if status == 'paid' or status == 'SUCCESS' %}
+                        <span style="color: var(--accent-success);">paid</span>
+                    {% else %}
+                        <span style="color: var(--accent-danger);">cancelled</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Dish Name</td>
+                <td>{{ dish_name if dish_name else 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td>Price / Amount</td>
+                <td>${{ amount }}</td>
+            </tr>
+            {% if session_id %}
+            <tr>
+                <td>Stripe Checkout Session ID</td>
+                <td><code>{{ session_id }}</code></td>
+            </tr>
+            {% endif %}
+            {% if payment_intent %}
+            <tr>
+                <td>Stripe Payment Intent ID</td>
+                <td><code>{{ payment_intent }}</code></td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+        <a href="{{ url_for('food_payment') }}" class="btn btn-stripe">
+            Order Food Again
+        </a>
+        <a href="{{ url_for('home') }}" class="btn btn-secondary">
+            Back to Home
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}PayPal Payment Result{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        {% if status == 'COMPLETED' or status == 'APPROVED' or status == 'SUCCESS' %}
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎟️</div>
+            <span class="badge badge-success" id="paypal-status-badge">PAYPAL PAYMENT SUCCESSFUL</span>
+            <h1 class="card-title" style="margin-top: 1rem;">IPL Ticket Reserved!</h1>
+            <p class="card-subtitle">Your transaction was captured via PayPal Sandbox API.</p>
+        {% else %}
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">❌</div>
+            <span class="badge badge-failure" id="paypal-status-badge">PAYPAL PAYMENT CANCELLED / FAILED</span>
+            <h1 class="card-title" style="margin-top: 1rem;">Payment Not Completed</h1>
+            <p class="card-subtitle">The PayPal payment flow was cancelled or could not be completed.</p>
+        {% endif %}
+    </div>
+
+    <table class="detail-table">
+        <tbody>
+            <tr>
+                <td>Payment Status</td>
+                <td>
+                    {% if status == 'COMPLETED' or status == 'APPROVED' or status == 'SUCCESS' %}
+                        <span style="color: var(--accent-success);">{{ status }}</span>
+                    {% else %}
+                        <span style="color: var(--accent-danger);">{{ status }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Customer Name</td>
+                <td>{{ name if name else 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td>Customer Email</td>
+                <td>{{ email if email else 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td>Ticket Amount</td>
+                <td>${{ amount }}</td>
+            </tr>
+            <tr>
+                <td>PayPal Order ID</td>
+                <td><code>{{ order_id if order_id else 'N/A' }}</code></td>
+            </tr>
+            {% if capture_id %}
+            <tr>
+                <td>Transaction / Capture ID</td>
+                <td><code>{{ capture_id }}</code></td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+        <a href="{{ url_for('paypal_pay') }}" class="btn btn-paypal">
+            Book Ticket with PayPal Again
+        </a>
+        <a href="{{ url_for('home') }}" class="btn btn-secondary">
+            Back to Home
+        </a>
+    </div>
+</div>
+{% endblock %}
