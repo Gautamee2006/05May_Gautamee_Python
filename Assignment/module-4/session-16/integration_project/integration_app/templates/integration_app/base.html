@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Integration App{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-glow: rgba(99, 102, 241, 0.35);
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --info-color: #06b6d4;
+            --google-btn-bg: #ffffff;
+            --google-btn-text: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #a5b4fc, #6366f1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .navbar-nav {
+            display: flex;
+            gap: 1.25rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0.5rem 0.85rem;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-nav-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+            color: white !important;
+            box-shadow: 0 4px 14px var(--accent-glow);
+        }
+
+        .btn-nav-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Card Component */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Messages / Alerts */
+        .alert-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+        }
+
+        .alert-error, .alert-danger {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        .alert-info {
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: #38bdf8;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1.15rem;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .otp-input {
+            letter-spacing: 0.5rem;
+            font-size: 1.5rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.85rem 1.75rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.25s ease;
+            gap: 0.6rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+            color: #fff;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn-google {
+            background: var(--google-btn-bg);
+            color: var(--google-btn-text);
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-top: 0.75rem;
+        }
+
+        .btn-google:hover {
+            background: #f1f5f9;
+            transform: translateY(-2px);
+        }
+
+        .btn-google svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--card-border);
+            margin-top: auto;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.825rem;
+            font-weight: 600;
+        }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+
+        @media (max-width: 640px) {
+            .navbar { padding: 1rem; flex-direction: column; gap: 1rem; }
+            .glass-card { padding: 1.5rem; }
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="{% url 'home' %}" class="navbar-brand">
+            ⚡ Integration App
+        </a>
+        <ul class="navbar-nav">
+            <li><a href="{% url 'home' %}" class="nav-link">Home</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'profile' %}" class="nav-link">Profile</a></li>
+                <li><a href="{% url 'send-otp' %}" class="nav-link">Send OTP</a></li>
+                <li><a href="{% url 'logout' %}" class="nav-link btn-nav-primary">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}" class="nav-link">Login</a></li>
+                <li><a href="{% url 'register' %}" class="nav-link btn-nav-primary">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="container">
+        <!-- Django Messages -->
+        {% if messages %}
+            <div class="alert-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        &copy; 2026 Integration App — Google OAuth, Mailgun & Twilio OTP Platform
+    </footer>
+</body>
+</html>

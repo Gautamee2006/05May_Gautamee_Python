@@ -1,0 +1,66 @@
+{% extends 'integration_app/base.html' %}
+
+{% block title %}{% if step == 'send' %}Send OTP{% else %}Verify OTP{% endif %} — Integration App{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 480px; margin: 0 auto; text-align: center;">
+    {% if step == 'send' %}
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">📲</div>
+        <h2 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">
+            Send SMS OTP
+        </h2>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+            Enter your mobile phone number to receive a secure 6-digit verification code.
+        </p>
+
+        <form method="post" action="{% url 'send-otp' %}" style="text-align: left;">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.phone_number.id_for_label }}">Mobile Phone Number *</label>
+                {{ form.phone_number }}
+                {% if form.phone_number.errors %}
+                    <small style="color: #f87171;">{{ form.phone_number.errors.0 }}</small>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">
+                🚀 Generate & Send OTP
+            </button>
+        </form>
+
+    {% else %}
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔐</div>
+        <h2 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">
+            Verify OTP Code
+        </h2>
+        <p style="color: var(--text-secondary); margin-bottom: 0.25rem;">
+            Enter the 6-digit code sent to your mobile phone:
+        </p>
+        <p style="font-weight: 600; color: var(--accent-primary); margin-bottom: 1.5rem;">
+            {{ phone_number|default:"Registered Phone" }}
+        </p>
+
+        <form method="post" action="{% url 'verify-otp' %}" style="text-align: left;">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.otp.id_for_label }}" style="text-align: center; display: block;">Enter 6-Digit Code</label>
+                {{ form.otp }}
+                {% if form.otp.errors %}
+                    <small style="color: #f87171; text-align: center; display: block; margin-top: 0.5rem;">{{ form.otp.errors.0 }}</small>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">
+                Check & Verify OTP
+            </button>
+        </form>
+
+        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: var(--text-secondary); font-size: 0.9rem;">Didn't receive code?</span>
+            <a href="{% url 'resend-otp' %}" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                🔄 Resend OTP
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

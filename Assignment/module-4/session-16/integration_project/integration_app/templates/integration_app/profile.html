@@ -1,0 +1,66 @@
+{% extends 'integration_app/base.html' %}
+
+{% block title %}User Profile — Integration App{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 600px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--card-border);">
+        <div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-primary), #a5b4fc); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; color: #fff; box-shadow: 0 4px 20px var(--accent-glow);">
+            {{ user.username|slice:":1"|upper }}
+        </div>
+        <div>
+            <h2 style="font-size: 1.8rem; font-weight: 700;">{{ user.username }}</h2>
+            <p style="color: var(--text-secondary);">Member since {{ user.date_joined|date:"F Y" }}</p>
+        </div>
+    </div>
+
+    <div style="display: grid; gap: 1.25rem;">
+        <div style="background: rgba(15, 23, 42, 0.4); padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid var(--card-border);">
+            <small style="color: var(--text-secondary); font-weight: 500; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">Username</small>
+            <p style="font-size: 1.1rem; font-weight: 600; margin-top: 0.2rem;">{{ user.username }}</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div style="background: rgba(15, 23, 42, 0.4); padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                <small style="color: var(--text-secondary); font-weight: 500; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">First Name</small>
+                <p style="font-size: 1.1rem; font-weight: 600; margin-top: 0.2rem;">{{ user.first_name|default:"Not specified" }}</p>
+            </div>
+
+            <div style="background: rgba(15, 23, 42, 0.4); padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                <small style="color: var(--text-secondary); font-weight: 500; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">Last Name</small>
+                <p style="font-size: 1.1rem; font-weight: 600; margin-top: 0.2rem;">{{ user.last_name|default:"Not specified" }}</p>
+            </div>
+        </div>
+
+        <div style="background: rgba(15, 23, 42, 0.4); padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid var(--card-border);">
+            <small style="color: var(--text-secondary); font-weight: 500; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">Email Address</small>
+            <p style="font-size: 1.1rem; font-weight: 600; margin-top: 0.2rem;">{{ user.email|default:"No email associated" }}</p>
+        </div>
+
+        <div style="background: rgba(15, 23, 42, 0.4); padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid var(--card-border);">
+            <small style="color: var(--text-secondary); font-weight: 500; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">Phone Verification Status</small>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.4rem;">
+                {% if verification %}
+                    <div>
+                        <span class="badge badge-success">Verified ✓</span>
+                        <span style="font-weight: 600; margin-left: 0.5rem; color: var(--text-primary);">{{ verification.phone_number }}</span>
+                    </div>
+                {% else %}
+                    <div>
+                        <span class="badge badge-warning">Unverified</span>
+                    </div>
+                    <a href="{% url 'send-otp' %}" class="btn btn-secondary" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;">
+                        Verify Now
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 2rem; text-align: center;">
+        <a href="{% url 'home' %}" class="btn btn-secondary">
+            ← Back to Home
+        </a>
+    </div>
+</div>
+{% endblock %}
