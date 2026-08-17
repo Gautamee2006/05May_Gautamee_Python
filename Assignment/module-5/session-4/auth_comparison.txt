@@ -1,0 +1,25 @@
+Q: What is the difference between TokenAuthentication and SessionAuthentication in Django REST Framework?
+
+Answer:
+
+1. Overview:
+- SessionAuthentication relies on Django's built-in session framework. It uses HTTP cookies to track authenticated user sessions across requests.
+- TokenAuthentication uses a static token string key assigned to each user. The client passes this token in the HTTP Authorization header with every request.
+
+2. Statefulness & Storage:
+- SessionAuthentication is stateful on the client-server boundary via browser cookies (`sessionid`). Server stores session data in the database/cache.
+- TokenAuthentication is header-based. The token is generated once on the server, stored in the database (`authtoken_token` table), and attached manually by the client in request headers.
+
+3. Typical Use Cases:
+- SessionAuthentication is best for browser-based web applications and Single Page Applications (SPAs) hosted on the same domain where browsers handle cookies automatically.
+- TokenAuthentication is best for native mobile apps (iOS/Android), multi-platform clients, desktop applications, and cross-domain APIs.
+
+4. CSRF Protection & Security:
+- SessionAuthentication requires CSRF protection for state-changing requests (POST, PUT, DELETE) because browsers send cookies automatically with requests.
+- TokenAuthentication does not use cookies and is not subject to browser CSRF attacks.
+
+5. Request Header Format:
+- SessionAuthentication Header: 
+  Cookie: sessionid=<session_key>
+- TokenAuthentication Header: 
+  Authorization: Token <token_key>
