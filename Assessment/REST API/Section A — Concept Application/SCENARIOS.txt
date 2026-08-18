@@ -1,0 +1,123 @@
+1.......
+
+SCENARIO:
+You are building a multi-city food delivery API that will be consumed by both a mobileapp and a web frontend. The frontend team asks why the API must be stateless.
+
+Question: 
+Explain what statelessness means in the context of REST and describe how thisprinciple affects the way your food delivery API handles user session data between requests.
+
+Answer:
+Statelessness in REST means the server does not store the client's session information between requests. Each request must contain all the required information, such as an authentication token.
+
+For example, in a food delivery API, the user sends a JWT token with every request. The server uses the token to identify the user instead of storing session data.
+
+Benefit: 
+It makes the API easier to scale, reliable, and allows any server to handle any request.
+
+===================================================================================================
+
+2.......
+
+SCENARIO:
+You are developing a restaurant management endpoint where a mobile app submitsnew menu items via a POST request. Your team is debating whether to use a plain Serializer or a ModelSerializer.
+
+Question:
+Justify why ModelSerializer is the better choice for this use case, and describe at leasttwo specific field-level validations you would add to protect the data integrity of menu items.
+
+Answer:
+ModelSerializer is better because it is directly connected to the Django model. It automatically creates fields and basic validations based on the model, which reduces the amount of code required.
+
+For a restaurant menu item, I would add validations such as:
+
+Price validation: Price must be greater than 0.
+Name validation: Menu item name must not be empty and should have a maximum length.
+
+This helps maintain valid and consistent menu data in the database.
+
+===================================================================================================
+
+3.....
+
+SCENARIO:
+You are organising the URL structure for a food ordering API that exposes three resources: Restaurants, Menus, and Orders. Currently each resource has five individual APIView classes mapped to five separate URL patterns.
+
+Question: 
+Explain how refactoring this to use a ModelViewSet with a DefaultRouter reduces URLmanagement overhead, and identify which HTTP methods are automatically handled by ModelViewSet.
+
+Answer:
+Using ModelViewSet with DefaultRouter reduces URL management because we don't need to create separate URL patterns for each CRUD operation. The router automatically generates the required URLs and connects them to the ViewSet actions.
+
+ModelViewSet automatically handles:
+
+GET → List and Retrieve
+POST → Create
+PUT → Update
+PATCH → Partial Update
+DELETE → Delete
+
+===================================================================================================
+
+4.......
+
+SCENARIO:
+You are designing a dish search endpoint that returns all available dishes across 500+restaurants. A QA engineer reports that responses take over 8 seconds on a standard connection.
+
+Question: 
+Identify the most likely cause of this performance issue and justify which DRF pagination class you would choose to fix it. Compare the trade-offs between PageNumberPagination and CursorPagination for this scenario.
+
+Answer:
+The most likely cause is that the API is returning all dishes from 500+ restaurants in a single response, which creates a large database query and response size.
+
+I would use CursorPagination because it is efficient for large datasets and provides faster, consistent pagination.
+
+Comparison:
+PageNumberPagination: Simple and user-friendly, but can become slower with very large datasets because the database may need to count and skip many records.
+CursorPagination: Faster and more efficient for large datasets, but users cannot easily jump directly to a specific page.
+
+For a large food delivery dataset, CursorPagination is the better choice for performance.
+
+===================================================================================================
+
+5......
+
+SCENARIO:
+You are debugging a food delivery API where a logged-in customer can view another customer's order history simply by changing the order ID in the URL. The IsAuthenticated permission is already applied.
+
+Question: 
+Identify the specific gap in the current permission setup and explain how you would implement object-level permission to ensure each customer can only access their own orders.
+
+Answer:
+The problem is that IsAuthenticated only checks whether the user is logged in. It does not check whether the requested order belongs to that user.
+
+To fix this, we should use object-level permission and check the order's owner.
+
+For example:
+def has_object_permission(self, request, view, obj):
+    return obj.customer == request.user
+
+
+This ensures that a customer can access only their own orders, even if they change the order ID in the URL.
+
+===================================================================================================
+
+6.....
+
+SCENARIO:
+You are optimising a restaurant discovery feature that currently stores only static latitude and longitude values in the database. A product manager requests a 'find restaurants near me' option that accepts a user's address string.
+
+Question: 
+Describe how you would integrate the Google Maps Geocoding API into a DRF view to convert an address string into coordinates and use those coordinates to return nearby restaurant results.
+
+Answer:
+I would use the Google Maps Geocoding API to convert the user's address into latitude and longitude.
+
+Steps:
+Get the address from the DRF request.
+Send the address to the Google Geocoding API using requests.
+Extract the latitude and longitude from the API response.
+Compare these coordinates with the restaurant's stored latitude and longitude.
+Return restaurants within a specific distance, such as 5 km.
+
+This allows the API to provide a “Find Restaurants Near Me” feature based on the user's address.
+
+===================================================================================================
