@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Profile Manager</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            padding: 25px 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            color: #2c3e50;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 9px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+            padding: 5px 12px;
+            font-size: 13px;
+        }
+        .btn-warning:hover {
+            background-color: #d68910;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #555;
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: #fcfcfc;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+        .badge-public {
+            background-color: #e8f8f5;
+            color: #117864;
+        }
+        .badge-private {
+            background-color: #fdedec;
+            color: #78281f;
+        }
+        .no-records {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Social Profile Manager</h1>
+            <div class="btn-group">
+                <a href="{% url 'profile_create' %}" class="btn btn-primary">Create Profile</a>
+                <a href="{% url 'profile_export' %}" class="btn btn-success">Export CSV</a>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Age</th>
+                    <th>Bio</th>
+                    <th>Account Visibility</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for profile in profiles %}
+                <tr>
+                    <td>{{ profile.id }}</td>
+                    <td><strong>{{ profile.username }}</strong></td>
+                    <td>{{ profile.email }}</td>
+                    <td>{{ profile.age }}</td>
+                    <td>{{ profile.bio|default:"--" }}</td>
+                    <td>
+                        {% if profile.is_public %}
+                            <span class="badge badge-public">Public</span>
+                        {% else %}
+                            <span class="badge badge-private">Private</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'profile_edit' profile.id %}" class="btn btn-warning">Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="no-records">No profiles found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
