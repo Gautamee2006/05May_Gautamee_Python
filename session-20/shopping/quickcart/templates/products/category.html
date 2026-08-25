@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} - QuickCart{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Category Header -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-dark text-white position-relative overflow-hidden">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <span class="badge bg-warning text-dark text-uppercase px-3 py-1 mb-2 fw-bold">Category</span>
+                <h2 class="fw-bold mb-2">{{ category.name }}</h2>
+                <p class="mb-0 text-muted opacity-75">{{ category.description|default:"Browse our collection of verified quality products." }}</p>
+            </div>
+            <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                <i class="fa-solid fa-tags display-1 text-warning opacity-25"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    {% if page_obj %}
+        <div class="row g-3">
+            {% for product in page_obj %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    {% include 'products/includes/product_card.html' %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm text-center p-5 rounded-4">
+            <i class="fa-solid fa-box-open display-1 text-muted mb-3"></i>
+            <h4>No products found in this category yet.</h4>
+            <p class="text-muted">Check back soon for new arrivals!</p>
+            <div class="mt-2">
+                <a href="{% url 'products:product_list' %}" class="btn btn-primary rounded-pill px-4">Browse All Products</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

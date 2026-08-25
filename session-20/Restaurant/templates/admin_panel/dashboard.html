@@ -1,0 +1,190 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block content %}
+<!-- STAT CARDS -->
+<div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
+
+    <div class="stat-card bg-white dark:bg-slate-800 p-5 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-950/40 flex items-center justify-center">
+                <i class="fa-solid fa-store text-warm-600 dark:text-warm-400"></i>
+            </div>
+            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full">Active</span>
+        </div>
+        <p class="text-2xl font-display font-extrabold text-slate-900 dark:text-white">{{ total_restaurants }}</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Total Restaurants</p>
+    </div>
+
+    <div class="stat-card bg-white dark:bg-slate-800 p-5 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950/40 flex items-center justify-center">
+                <i class="fa-solid fa-users text-sky-600 dark:text-sky-400"></i>
+            </div>
+        </div>
+        <p class="text-2xl font-display font-extrabold text-slate-900 dark:text-white">{{ total_customers }}</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Total Customers</p>
+    </div>
+
+    <div class="stat-card bg-white dark:bg-slate-800 p-5 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950/40 flex items-center justify-center">
+                <i class="fa-solid fa-bag-shopping text-blue-600 dark:text-blue-400"></i>
+            </div>
+        </div>
+        <p class="text-2xl font-display font-extrabold text-slate-900 dark:text-white">{{ total_orders_today }}</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Today's Orders</p>
+    </div>
+
+    <div class="stat-card bg-white dark:bg-slate-800 p-5 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-950/40 flex items-center justify-center">
+                <i class="fa-solid fa-chair text-purple-600 dark:text-purple-400"></i>
+            </div>
+        </div>
+        <p class="text-2xl font-display font-extrabold text-slate-900 dark:text-white">{{ total_reservations_today }}</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Today's Reservations</p>
+    </div>
+
+    <div class="stat-card bg-gradient-to-br from-warm-500 to-warm-600 p-5 rounded-2xl shadow-md text-white col-span-2 md:col-span-1">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                <i class="fa-solid fa-dollar-sign text-white text-lg"></i>
+            </div>
+        </div>
+        <p class="text-2xl font-display font-extrabold">${{ total_revenue }}</p>
+        <p class="text-xs text-orange-100 font-medium mt-1">Total Revenue</p>
+        <p class="text-[11px] text-orange-200 mt-1">Today: ${{ revenue_today }}</p>
+    </div>
+</div>
+
+<!-- SECOND ROW STATS -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="stat-card bg-white dark:bg-slate-800 p-4 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/40 flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-clock text-amber-600 dark:text-amber-400"></i>
+        </div>
+        <div>
+            <p class="text-xl font-display font-extrabold text-slate-900 dark:text-white">{{ pending_orders }}</p>
+            <p class="text-xs text-slate-500 font-medium">Pending Orders</p>
+        </div>
+    </div>
+    <div class="stat-card bg-white dark:bg-slate-800 p-4 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/40 flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-hourglass-half text-rose-600 dark:text-rose-400"></i>
+        </div>
+        <div>
+            <p class="text-xl font-display font-extrabold text-slate-900 dark:text-white">{{ pending_reservations }}</p>
+            <p class="text-xs text-slate-500 font-medium">Pending Reservations</p>
+        </div>
+    </div>
+    <div class="stat-card bg-white dark:bg-slate-800 p-4 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/40 flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-star text-amber-500"></i>
+        </div>
+        <div>
+            <p class="text-xl font-display font-extrabold text-slate-900 dark:text-white">{{ avg_rating }}</p>
+            <p class="text-xs text-slate-500 font-medium">Avg Restaurant Rating</p>
+        </div>
+    </div>
+    <div class="stat-card bg-white dark:bg-slate-800 p-4 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-trophy text-emerald-600 dark:text-emerald-400"></i>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-display font-extrabold text-slate-900 dark:text-white truncate">{{ popular_restaurant.name|default:"—" }}</p>
+            <p class="text-xs text-slate-500 font-medium">Most Popular</p>
+        </div>
+    </div>
+</div>
+
+<!-- RECENT ORDERS + RESERVATIONS -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+    <!-- Recent Orders -->
+    <div class="xl:col-span-2 bg-white dark:bg-slate-800 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-amber-100 dark:border-slate-700 flex items-center justify-between">
+            <h3 class="font-display font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-bag-shopping text-blue-500"></i> Recent Orders
+            </h3>
+            <a href="{% url 'panel_order_list' %}" class="text-xs font-bold text-warm-600 dark:text-warm-400 hover:underline">View All →</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="bg-amber-50/60 dark:bg-slate-700/40 text-left">
+                        <th class="px-4 py-3 font-bold text-slate-600 dark:text-slate-300">Order #</th>
+                        <th class="px-4 py-3 font-bold text-slate-600 dark:text-slate-300">Customer</th>
+                        <th class="px-4 py-3 font-bold text-slate-600 dark:text-slate-300">Amount</th>
+                        <th class="px-4 py-3 font-bold text-slate-600 dark:text-slate-300">Status</th>
+                        <th class="px-4 py-3 font-bold text-slate-600 dark:text-slate-300">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr class="table-row border-t border-slate-100 dark:border-slate-700/60">
+                        <td class="px-4 py-3 font-bold text-warm-600 dark:text-warm-400">
+                            <a href="{% url 'panel_order_detail' order.id %}">#{{ order.order_number|slice:":12" }}…</a>
+                        </td>
+                        <td class="px-4 py-3 text-slate-700 dark:text-slate-300">{{ order.user.get_full_name|default:order.user.username }}</td>
+                        <td class="px-4 py-3 font-bold text-slate-900 dark:text-white">${{ order.final_amount }}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-0.5 rounded-full font-bold text-[10px] uppercase
+                                {% if order.status == 'delivered' %}bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300
+                                {% elif order.status == 'cancelled' %}bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300
+                                {% elif order.status == 'pending' %}bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300
+                                {% else %}bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300{% endif %}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-slate-400">{{ order.created_at|date:"M d, H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="px-4 py-8 text-center text-slate-400">No orders yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Recent Reservations + Top Food -->
+    <div class="space-y-6">
+        <!-- Most Ordered Food -->
+        {% if most_ordered_food %}
+        <div class="bg-gradient-to-br from-amber-500/10 to-warm-500/5 dark:from-slate-800 dark:to-slate-800 border border-amber-200 dark:border-slate-700 rounded-2xl p-5">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">🍕 Most Ordered Food</p>
+            <p class="font-display font-extrabold text-lg text-slate-900 dark:text-white leading-tight">{{ most_ordered_food.food_name }}</p>
+            <p class="text-sm font-bold text-warm-600 dark:text-warm-400 mt-1">{{ most_ordered_food.count }} orders</p>
+        </div>
+        {% endif %}
+
+        <!-- Recent Reservations -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-amber-100 dark:border-slate-700 flex items-center justify-between">
+                <h3 class="font-display font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-chair text-purple-500"></i> Recent Bookings
+                </h3>
+                <a href="{% url 'panel_reservation_list' %}" class="text-xs font-bold text-warm-600 dark:text-warm-400 hover:underline">All →</a>
+            </div>
+            <div class="divide-y divide-slate-100 dark:divide-slate-700/60">
+                {% for res in recent_reservations %}
+                <div class="px-5 py-3 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ res.user.get_full_name|default:res.user.username }}</p>
+                        <p class="text-[11px] text-slate-400">{{ res.restaurant.name|truncatechars:20 }} • {{ res.date|date:"M d" }} {{ res.time|time:"h:i A" }}</p>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase
+                        {% if res.status == 'confirmed' %}bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300
+                        {% elif res.status == 'cancelled' %}bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300
+                        {% else %}bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300{% endif %}">
+                        {{ res.status }}
+                    </span>
+                </div>
+                {% empty %}
+                <p class="px-5 py-6 text-xs text-center text-slate-400">No reservations yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

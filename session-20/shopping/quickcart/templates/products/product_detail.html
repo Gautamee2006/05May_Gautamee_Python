@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - QuickCart{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:category' product.category.slug %}" class="text-decoration-none">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name|truncatechars:30 }}</li>
+        </ol>
+    </nav>
+
+    <!-- Main Detail Grid -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <div class="row g-4">
+            
+            <!-- Left Column: Gallery -->
+            <div class="col-lg-5">
+                <div class="position-relative bg-light rounded-4 p-3 text-center mb-3" style="min-height: 350px;">
+                    {% if product.discount_percentage > 0 %}
+                        <span class="qc-badge-discount fs-6">{{ product.discount_percentage }}% OFF</span>
+                    {% endif %}
+                    {% if product.main_image %}
+                        <img id="mainProductImage" src="{{ product.main_image.url }}" alt="{{ product.name }}" class="img-fluid object-fit-contain" style="max-height: 350px;">
+                    {% else %}
+                        <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                            <i class="fa-regular fa-image display-1"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Thumbnails Gallery -->
+                <div class="d-flex gap-2 overflow-x-auto pb-2">
+                    {% if product.main_image %}
+                        <img src="{{ product.main_image.url }}" data-src="{{ product.main_image.url }}" class="qc-thumbnail img-thumbnail rounded-3 active" style="width: 70px; height: 70px; object-fit: contain; cursor: pointer;">
+                    {% endif %}
+                    {% for img in images %}
+                        <img src="{{ img.image.url }}" data-src="{{ img.image.url }}" class="qc-thumbnail img-thumbnail rounded-3" style="width: 70px; height: 70px; object-fit: contain; cursor: pointer;">
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Right Column: Info & Actions -->
+            <div class="col-lg-7">
+                <div class="badge bg-secondary text-uppercase mb-2">{{ product.brand }}</div>
+                <h2 class="fw-bold mb-2">{{ product.name }}</h2>
+                <div class="small text-muted mb-3">SKU: <span class="fw-semibold text-dark">{{ product.sku }}</span></div>
+
+                <!-- Rating -->
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="qc-rating-badge fs-6">{{ product.rating|stringformat:".1f" }} <i class="fa-solid fa-star"></i></span>
+                    <span class="text-muted small">({{ reviews.count }} customer review{{ reviews.count|pluralize }})</span>
+                </div>
+
+                <!-- Price Block -->
+                <div class="p-3 bg-light rounded-3 mb-4 d-flex align-items-baseline gap-3">
+                    <span class="fs-2 fw-extrabold text-dark">₹{{ product.final_price }}</span>
+                    {% if product.discount_percentage > 0 %}
+                        <span class="fs-5 text-muted text-decoration-line-through">₹{{ product.price }}</span>
+                        <span class="badge bg-danger">Save {{ product.discount_percentage }}%</span>
+                    {% endif %}
+                </div>
+
+                <!-- Description Snippet -->
+                <div class="mb-4">
+                    <h6 class="fw-bold">Description</h6>
+                    <p class="text-muted mb-0" style="white-space: pre-line;">{{ product.description }}</p>
+                </div>
+
+                <!-- Stock & Actions -->
+                <form action="{% url 'cart:add_to_cart' product.id %}" method="POST">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Availability Status:</label>
+                        {% if product.stock > 0 %}
+                            <span class="badge bg-success-subtle text-success border border-success ms-2 px-3 py-1">In Stock ({{ product.stock }} units available)</span>
+                        {% else %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger ms-2 px-3 py-1">Out of Stock</span>
+                        {% endif %}
+                    </div>
+
+                    {% if product.stock > 0 %}
+                        <!-- Quantity Selector -->
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <label class="form-label fw-semibold mb-0">Quantity:</label>
+                            <div class="input-group" style="max-width: 140px;">
+                                <button type="button" class="btn btn-outline-secondary" id="btnQtyMinus"><i class="fa-solid fa-minus"></i></button>
+                                <input type="number" name="quantity" id="productQtyInput" class="form-control text-center fw-bold" value="1" min="1" max="{{ product.stock }}" readonly>
+                                <button type="button" class="btn btn-outline-secondary" id="btnQtyPlus"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex flex-wrap gap-3">
+                            <button type="submit" name="action" value="add_to_cart" class="btn btn-warning btn-lg rounded-pill px-4 fw-bold text-dark flex-grow-1 shadow-sm">
+                                <i class="fa-solid fa-cart-shopping me-2"></i> Add to Cart
+                            </button>
+                            <button type="submit" name="action" value="buy_now" class="btn btn-primary btn-lg rounded-pill px-4 fw-bold flex-grow-1 shadow-sm">
+                                <i class="fa-solid fa-bolt me-2"></i> Buy Now
+                            </button>
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'cart:toggle_wishlist' product.id %}" class="btn btn-outline-danger btn-lg rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;" title="Wishlist">
+                                    <i class="fa-solid fa-heart"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Reviews Section -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <h4 class="fw-bold mb-4"><i class="fa-solid fa-comments text-primary me-2"></i> Customer Ratings & Reviews</h4>
+
+        {% if can_review %}
+            <!-- Add Review Form -->
+            <div class="card bg-light border-0 p-3 rounded-3 mb-4">
+                <h5 class="fw-bold mb-2">Write a Review</h5>
+                <form action="{% url 'products:add_review' product.id %}" method="POST">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Rating</label>
+                            {{ review_form.rating }}
+                        </div>
+                        <div class="col-md-9">
+                            <label class="form-label fw-semibold">Your Experience</label>
+                            {{ review_form.review_text }}
+                        </div>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <button type="submit" class="btn btn-success fw-bold rounded-pill px-4">Submit Review</button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+
+        <!-- Reviews List -->
+        {% if reviews %}
+            <div class="d-flex flex-column gap-3">
+                {% for rev in reviews %}
+                    <div class="border-bottom pb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div class="fw-bold text-dark">
+                                <i class="fa-solid fa-circle-user text-secondary me-1"></i> {{ rev.user.first_name|default:rev.user.username }}
+                                <span class="badge bg-success ms-2">{{ rev.rating }} <i class="fa-solid fa-star"></i></span>
+                            </div>
+                            <span class="text-muted small">{{ rev.created_at|date:"d M Y" }}</span>
+                        </div>
+                        <p class="text-secondary mb-0">{{ rev.review_text }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted mb-0">No reviews yet for this product. Be the first to purchase and review!</p>
+        {% endif %}
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+        <div class="mb-4">
+            <div class="qc-section-title">
+                <span><i class="fa-solid fa-layer-group text-primary me-2"></i> Related Products</span>
+            </div>
+            <div class="row g-3">
+                {% for product in related_products %}
+                    <div class="col-6 col-md-3">
+                        {% include 'products/includes/product_card.html' %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

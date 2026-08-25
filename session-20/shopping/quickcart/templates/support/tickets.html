@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}My Support Tickets - QuickCart{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0"><i class="fa-solid fa-headset text-info me-2"></i> My Support Tickets</h3>
+        <a href="{% url 'support:contact' %}" class="btn btn-primary rounded-pill fw-semibold">
+            <i class="fa-solid fa-plus me-1"></i> New Ticket
+        </a>
+    </div>
+
+    {% if tickets %}
+        <div class="d-flex flex-column gap-3">
+            {% for ticket in tickets %}
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <span class="badge bg-secondary font-monospace">{{ ticket.ticket_id }}</span>
+                            <span class="badge bg-info text-dark ms-1">{{ ticket.category }}</span>
+                        </div>
+                        <span class="badge {% if ticket.status == 'Open' %}bg-warning text-dark{% elif ticket.status == 'Resolved' %}bg-success{% else %}bg-secondary{% endif %} px-3 py-1 fs-6">
+                            {{ ticket.status }}
+                        </span>
+                    </div>
+
+                    <h5 class="fw-bold mb-2">{{ ticket.subject }}</h5>
+                    <p class="text-secondary mb-2">{{ ticket.message }}</p>
+                    <div class="small text-muted"><i class="fa-solid fa-clock me-1"></i> Created on {{ ticket.created_at|date:"d M Y, h:i A" }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm text-center p-5 rounded-4">
+            <i class="fa-solid fa-headset display-1 text-muted mb-3"></i>
+            <h4>No Support Tickets Found</h4>
+            <p class="text-muted">Need help with an order or account? Submit a support ticket anytime.</p>
+            <div class="mt-2">
+                <a href="{% url 'support:contact' %}" class="btn btn-warning rounded-pill px-4 fw-bold text-dark">Submit Ticket</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

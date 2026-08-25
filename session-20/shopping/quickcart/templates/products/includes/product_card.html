@@ -1,0 +1,54 @@
+<div class="qc-card">
+    <div class="qc-product-img-wrapper">
+        {% if product.discount_percentage > 0 %}
+            <span class="qc-badge-discount">{{ product.discount_percentage }}% OFF</span>
+        {% endif %}
+        
+        {% if user.is_authenticated %}
+            <a href="{% url 'cart:toggle_wishlist' product.id %}" class="qc-wishlist-btn" title="Add to Wishlist">
+                <i class="fa-solid fa-heart"></i>
+            </a>
+        {% endif %}
+
+        <a href="{% url 'products:product_detail' product.slug %}">
+            {% if product.main_image %}
+                <img src="{{ product.main_image.url }}" alt="{{ product.name }}" class="qc-product-img">
+            {% else %}
+                <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                    <i class="fa-regular fa-image fs-1"></i>
+                </div>
+            {% endif %}
+        </a>
+    </div>
+
+    <div class="qc-card-body">
+        <div class="qc-product-brand">{{ product.brand }}</div>
+        <a href="{% url 'products:product_detail' product.slug %}" class="qc-product-title" title="{{ product.name }}">
+            {{ product.name }}
+        </a>
+
+        <div class="qc-rating-badge">
+            {{ product.rating|stringformat:".1f" }} <i class="fa-solid fa-star"></i>
+        </div>
+
+        <div class="qc-price-section mt-2">
+            <span class="qc-final-price">₹{{ product.final_price }}</span>
+            {% if product.discount_percentage > 0 %}
+                <span class="qc-original-price">₹{{ product.price }}</span>
+            {% endif %}
+        </div>
+
+        <div class="d-grid mt-3">
+            {% if product.stock > 0 %}
+                <form action="{% url 'cart:add_to_cart' product.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn qc-btn-primary btn-sm w-100">
+                        <i class="fa-solid fa-cart-plus me-1"></i> Add to Cart
+                    </button>
+                </form>
+            {% else %}
+                <button class="btn btn-secondary btn-sm w-100" disabled>Out of Stock</button>
+            {% endif %}
+        </div>
+    </div>
+</div>

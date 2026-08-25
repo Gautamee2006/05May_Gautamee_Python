@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}User Dashboard - TasteTrail{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    
+    <!-- HEADER -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-warm-500 to-amber-500 flex items-center justify-center text-white text-2xl font-bold shadow-md">
+                {{ user.username|slice:":1"|upper }}
+            </div>
+            <div>
+                <h1 class="font-display font-extrabold text-2xl text-slate-900 dark:text-white">Welcome back, {{ user.first_name|default:user.username }}!</h1>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Track your orders, manage bookings and view recent food activities.</p>
+            </div>
+        </div>
+        <a href="{% url 'profile' %}" class="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700">
+            <i class="fa-solid fa-pen-to-square mr-1"></i> Edit Profile
+        </a>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <a href="{% url 'favorites_list' %}" class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm card-hover-effect flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-500 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-heart"></i>
+            </div>
+            <div>
+                <span class="font-display font-extrabold text-2xl text-slate-900 dark:text-white">{{ favorites_count }}</span>
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Favorite Restaurants</p>
+            </div>
+        </a>
+
+        <a href="{% url 'order_list' %}" class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm card-hover-effect flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-500 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+            <div>
+                <span class="font-display font-extrabold text-2xl text-slate-900 dark:text-white">{{ orders_count }}</span>
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Orders</p>
+            </div>
+        </a>
+
+        <a href="{% url 'reservation_list' %}" class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm card-hover-effect flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-500 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-chair"></i>
+            </div>
+            <div>
+                <span class="font-display font-extrabold text-2xl text-slate-900 dark:text-white">{{ reservations_count }}</span>
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Table Reservations</p>
+            </div>
+        </a>
+    </div>
+
+    <!-- MAIN TWO COLUMN DASHBOARD -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- RECENT ORDERS -->
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Recent Food Orders</h3>
+                <a href="{% url 'order_list' %}" class="text-xs font-bold text-warm-600 dark:text-warm-400 hover:underline">View All</a>
+            </div>
+
+            {% if recent_orders %}
+            <div class="space-y-3">
+                {% for order in recent_orders %}
+                <a href="{% url 'order_detail' order.id %}" class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-amber-300 transition-colors">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-xs text-slate-900 dark:text-white">#{{ order.order_number }}</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase
+                                {% if order.status == 'delivered' %} bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300
+                                {% elif order.status == 'cancelled' %} bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300
+                                {% else %} bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 {% endif %}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-0.5">{{ order.created_at|date:"M d, Y • h:i A" }}</p>
+                    </div>
+                    <span class="font-extrabold text-sm text-warm-600 dark:text-warm-400">${{ order.final_amount }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-8 text-slate-400 text-xs">
+                <i class="fa-solid fa-utensils text-2xl mb-2"></i>
+                <p>No orders placed yet. Explore restaurants and make your first order!</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- UPCOMING RESERVATIONS -->
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Upcoming Reservations</h3>
+                <a href="{% url 'reservation_list' %}" class="text-xs font-bold text-warm-600 dark:text-warm-400 hover:underline">View All</a>
+            </div>
+
+            {% if upcoming_reservations %}
+            <div class="space-y-3">
+                {% for res in upcoming_reservations %}
+                <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+                    <div>
+                        <h4 class="font-bold text-xs text-slate-900 dark:text-white">{{ res.restaurant.name }}</h4>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                            <i class="fa-regular fa-calendar mr-1"></i>{{ res.date }} at {{ res.time|time:"h:i A" }} • {{ res.num_people }} Guests
+                        </p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase
+                        {% if res.status == 'confirmed' %} bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300
+                        {% elif res.status == 'cancelled' %} bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300
+                        {% else %} bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 {% endif %}">
+                        {{ res.get_status_display }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-8 text-slate-400 text-xs">
+                <i class="fa-solid fa-chair text-2xl mb-2"></i>
+                <p>No active reservations found. Book a table at your favorite dining spot!</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- RECENT SEARCH HISTORY -->
+    {% if recent_searches %}
+    <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm space-y-3">
+        <h3 class="font-display font-bold text-sm text-slate-800 dark:text-slate-200">Recent Search History</h3>
+        <div class="flex flex-wrap gap-2">
+            {% for s in recent_searches %}
+            <a href="{% url 'restaurant_list' %}?search={{ s.query }}" class="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:bg-warm-500 hover:text-white transition-colors">
+                <i class="fa-solid fa-clock-rotate-left mr-1.5 text-[10px] text-warm-500"></i>{{ s.query }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

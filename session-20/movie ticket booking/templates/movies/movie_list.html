@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Now Showing - Movie List{% endblock %}
+
+{% block content %}
+<div class="container movies-container">
+    <div class="page-header">
+        <h1>🎬 Now Showing Movies</h1>
+        <p>Explore latest releases and book your favorite cinema shows</p>
+    </div>
+
+    <!-- Search and Filter Controls -->
+    <div class="filter-section">
+        <form method="GET" action="{% url 'movie_list' %}" class="filter-form">
+            <div class="search-input-group">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search movies by title..." class="form-control search-input">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+
+            <div class="filter-dropdowns">
+                <select name="genre" class="form-control filter-select" onchange="this.form.submit()">
+                    <option value="">All Genres</option>
+                    {% for g in all_genres %}
+                        <option value="{{ g }}" {% if selected_genre == g %}selected{% endif %}>{{ g }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="language" class="form-control filter-select" onchange="this.form.submit()">
+                    <option value="">All Languages</option>
+                    {% for l in all_languages %}
+                        <option value="{{ l }}" {% if selected_language == l %}selected{% endif %}>{{ l }}</option>
+                    {% endfor %}
+                </select>
+
+                {% if query or selected_genre or selected_language %}
+                    <a href="{% url 'movie_list' %}" class="btn btn-outline-secondary btn-sm">Clear Filters</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Movie Cards Grid -->
+    {% if movies %}
+        <div class="movies-grid">
+            {% for movie in movies %}
+                <div class="movie-card">
+                    <div class="poster-wrapper">
+                        <img src="{{ movie.poster }}" alt="{{ movie.title }}" class="movie-poster" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80'">
+                        <div class="rating-badge">⭐ {{ movie.rating|floatformat:1 }}</div>
+                    </div>
+                    
+                    <div class="movie-card-body">
+                        <div class="movie-tags">
+                            <span class="tag genre-tag">{{ movie.genre }}</span>
+                            <span class="tag lang-tag">{{ movie.language }}</span>
+                        </div>
+                        <h3 class="movie-title">{{ movie.title }}</h3>
+                        <p class="movie-duration">⏳ {{ movie.duration }} min | 📅 {{ movie.release_date|date:"M d, Y" }}</p>
+                        <p class="movie-desc">{{ movie.description|truncatewords:15 }}</p>
+                    </div>
+
+                    <div class="movie-card-footer">
+                        <a href="{% url 'movie_detail' movie.id %}" class="btn btn-primary btn-block">View Details & Book</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-results-card">
+            <div class="no-results-icon">🎥</div>
+            <h2>No movies found.</h2>
+            <p>Try searching for a different title or clearing your genre/language filters.</p>
+            <a href="{% url 'movie_list' %}" class="btn btn-primary mt-2">View All Movies</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

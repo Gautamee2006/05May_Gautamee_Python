@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Exclusive Offers & Coupons - TasteTrail{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div class="border-b border-slate-200 dark:border-slate-700 pb-4">
+        <h1 class="font-display font-extrabold text-3xl text-slate-900 dark:text-white flex items-center gap-3">
+            <i class="fa-solid fa-tags text-warm-500"></i> Offers & Discount Coupons
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Save big on food orders with active promotional codes</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for offer in offers %}
+        <div class="bg-gradient-to-br from-amber-500/10 via-white to-white dark:from-slate-800 dark:via-slate-800 dark:to-slate-800/90 rounded-3xl p-6 border border-amber-200 dark:border-slate-700 shadow-md flex flex-col justify-between space-y-6 card-hover-effect">
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="px-3 py-1 rounded-full bg-warm-600 text-white font-extrabold text-xs uppercase shadow-sm">
+                        {{ offer.discount_percentage }}% OFF
+                    </span>
+                    <span class="text-[11px] text-slate-400 font-medium">Expires {{ offer.end_date|date:"M d, Y" }}</span>
+                </div>
+
+                <h3 class="font-display font-extrabold text-xl text-slate-900 dark:text-white">{{ offer.title }}</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{{ offer.description }}</p>
+
+                {% if offer.restaurant %}
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                    <i class="fa-solid fa-store mr-1 text-amber-500"></i> Valid at <span class="font-bold text-slate-800 dark:text-slate-200">{{ offer.restaurant.name }}</span>
+                </p>
+                {% else %}
+                <p class="text-xs text-emerald-600 font-bold">
+                    <i class="fa-solid fa-globe mr-1"></i> Valid across all partner restaurants!
+                </p>
+                {% endif %}
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] text-slate-400 block uppercase tracking-wider font-semibold">Coupon Code</span>
+                    <span class="font-mono font-extrabold text-base text-warm-600 dark:text-warm-400 tracking-wider">
+                        {{ offer.coupon_code }}
+                    </span>
+                </div>
+                <a href="{% if offer.restaurant %}{% url 'restaurant_detail' offer.restaurant.id %}{% else %}{% url 'restaurant_list' %}{% endif %}" class="px-4 py-2 rounded-xl bg-warm-600 text-white font-bold text-xs shadow-md">
+                    Use Coupon
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

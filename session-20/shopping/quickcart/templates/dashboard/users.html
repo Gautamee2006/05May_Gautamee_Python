@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Users - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 my-4">
+    <h3 class="fw-bold mb-4"><i class="fa-solid fa-users text-info me-2"></i> User Accounts Management</h3>
+
+    <div class="qc-dashboard-card">
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Joined Date</th>
+                        <th>Status</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                        <tr>
+                            <td class="fw-bold text-dark">{{ u.username }} {% if u.is_staff %}<span class="badge bg-danger ms-1">Staff</span>{% endif %}</td>
+                            <td>{{ u.get_full_name|default:"-" }}</td>
+                            <td>{{ u.email }}</td>
+                            <td>{{ u.profile.mobile|default:"-" }}</td>
+                            <td class="small text-muted">{{ u.date_joined|date:"d M Y" }}</td>
+                            <td>
+                                {% if u.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Deactivated</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                {% if not u.is_superuser %}
+                                    <form method="POST" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="user_id" value="{{ u.id }}">
+                                        <input type="hidden" name="action" value="toggle_active">
+                                        <button type="submit" class="btn btn-sm {% if u.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
+                                            {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

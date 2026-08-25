@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Successful - QuickCart{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 text-center">
+            <div class="card border-0 shadow-lg rounded-4 p-5">
+                <div class="mb-4">
+                    <div class="bg-success-subtle text-success d-inline-flex p-4 rounded-circle display-3 mb-2 shadow-sm">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h2 class="fw-bold text-dark mb-2">Thank You For Your Order!</h2>
+                    <p class="text-muted lead">Your order has been placed and is currently being processed.</p>
+                </div>
+
+                <div class="bg-light p-4 rounded-3 text-start mb-4">
+                    <div class="row g-2">
+                        <div class="col-6"><strong>Order Number:</strong></div>
+                        <div class="col-6 text-end text-primary fw-bold">#{{ order.order_id }}</div>
+
+                        <div class="col-6"><strong>Order Status:</strong></div>
+                        <div class="col-6 text-end"><span class="badge bg-success">{{ order.order_status }}</span></div>
+
+                        <div class="col-6"><strong>Payment Status:</strong></div>
+                        <div class="col-6 text-end"><span class="badge bg-info text-dark">{{ order.payment_status }}</span></div>
+
+                        <div class="col-6"><strong>Total Amount:</strong></div>
+                        <div class="col-6 text-end text-dark fw-extrabold fs-5">₹{{ order.total_amount }}</div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-3 justify-content-center">
+                    <a href="{% url 'orders:order_detail' order.order_id %}" class="btn btn-primary btn-lg rounded-pill fw-bold px-4">
+                        <i class="fa-solid fa-truck-fast me-2"></i> Track Order
+                    </a>
+                    <a href="{% url 'orders:invoice' order.order_id %}" target="_blank" class="btn btn-outline-dark btn-lg rounded-pill fw-semibold px-4">
+                        <i class="fa-solid fa-file-invoice me-2"></i> View & Print Invoice
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

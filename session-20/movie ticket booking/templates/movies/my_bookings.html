@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings - CineTicket{% endblock %}
+
+{% block content %}
+<div class="container my-bookings-container">
+    <div class="page-header">
+        <h1>🎟️ My Ticket Bookings</h1>
+        <p>Manage your past and active movie ticket reservations</p>
+    </div>
+
+    {% if bookings %}
+        <div class="bookings-list">
+            {% for booking in bookings %}
+                <div class="booking-card">
+                    <div class="booking-card-header">
+                        <div>
+                            <span class="booking-id">ID: <strong>{{ booking.booking_id }}</strong></span>
+                            <span class="booking-date-meta">Booked on {{ booking.booking_date|date:"M d, Y, h:i A" }}</span>
+                        </div>
+                        <span class="status-badge status-{{ booking.status|lower }}">{{ booking.status }}</span>
+                    </div>
+
+                    <div class="booking-card-body">
+                        <div class="booking-movie-thumb">
+                            <img src="{{ booking.movie.poster }}" alt="{{ booking.movie.title }}" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80'">
+                        </div>
+
+                        <div class="booking-info">
+                            <h3 class="movie-name">{{ booking.movie.title }}</h3>
+                            <p class="show-meta">
+                                🗓️ {{ booking.show.date|date:"D, M d, Y" }} | 🕒 {{ booking.show.time }} | 📺 {{ booking.show.screen_name }}
+                            </p>
+                            <p class="seats-meta">
+                                💺 Seats: <strong>{{ booking.selected_seats }}</strong>
+                            </p>
+                            <p class="amount-meta">
+                                💰 Total Amount: <strong>₹{{ booking.total_amount }}</strong>
+                            </p>
+                        </div>
+
+                        <div class="booking-actions">
+                            <a href="{% url 'booking_detail' booking.booking_id %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-results-card">
+            <div class="no-results-icon">🎟️</div>
+            <h2>No bookings found.</h2>
+            <p>You haven't booked any movie tickets yet.</p>
+            <a href="{% url 'movie_list' %}" class="btn btn-primary mt-2">Browse Movies & Book Now</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

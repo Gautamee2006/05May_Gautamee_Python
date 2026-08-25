@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Orders - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 my-4">
+    <h3 class="fw-bold mb-4"><i class="fa-solid fa-boxes-stacked text-primary me-2"></i> Order Fulfillment Management</h3>
+
+    <div class="qc-dashboard-card">
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                        <th>Payment Status</th>
+                        <th>Current Order Status</th>
+                        <th>Update Order Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ord in orders %}
+                        <tr>
+                            <td class="fw-bold text-primary">#{{ ord.order_id }}</td>
+                            <td>{{ ord.user.get_full_name|default:ord.user.username }}<br><span class="small text-muted">{{ ord.user.email }}</span></td>
+                            <td class="fw-extrabold text-dark">₹{{ ord.total_amount }}</td>
+                            <td><span class="badge bg-info text-dark">{{ ord.payment_status }}</span></td>
+                            <td><span class="badge bg-success">{{ ord.order_status }}</span></td>
+                            <td>
+                                <form method="POST" class="d-flex align-items-center gap-2">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="order_id" value="{{ ord.id }}">
+                                    <select name="order_status" class="form-select form-select-sm" style="min-width: 140px;">
+                                        <option value="Placed" {% if ord.order_status == 'Placed' %}selected{% endif %}>Placed</option>
+                                        <option value="Confirmed" {% if ord.order_status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+                                        <option value="Packed" {% if ord.order_status == 'Packed' %}selected{% endif %}>Packed</option>
+                                        <option value="Shipped" {% if ord.order_status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                                        <option value="Out for Delivery" {% if ord.order_status == 'Out for Delivery' %}selected{% endif %}>Out for Delivery</option>
+                                        <option value="Delivered" {% if ord.order_status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                                        <option value="Cancelled" {% if ord.order_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                                        <option value="Returned" {% if ord.order_status == 'Returned' %}selected{% endif %}>Returned</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-dark fw-bold">Update</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

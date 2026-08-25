@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Select Seats - {{ movie.title }}{% endblock %}
+
+{% block content %}
+<div class="container seat-booking-container">
+    <a href="{% url 'movie_detail' movie.id %}" class="back-link">&larr; Back to Movie Details</a>
+
+    <div class="booking-layout">
+        <!-- Seat Grid Layout -->
+        <div class="seat-matrix-card">
+            <div class="show-header">
+                <h2>Select Seats for <span>{{ movie.title }}</span></h2>
+                <p class="show-info-text">
+                    📅 {{ show.date|date:"D, M d, Y" }} | 🕒 {{ show.time }} | 📺 {{ show.screen_name }}
+                </p>
+            </div>
+
+            <!-- Screen Visual Representation -->
+            <div class="screen-container">
+                <div class="screen-curve"></div>
+                <div class="screen-text">SCREEN THIS WAY</div>
+            </div>
+
+            <!-- Seat Status Legend -->
+            <div class="seat-legend">
+                <div class="legend-item"><span class="seat-sample available"></span> Available</div>
+                <div class="legend-item"><span class="seat-sample selected"></span> Selected</div>
+                <div class="legend-item"><span class="seat-sample booked"></span> Booked</div>
+            </div>
+
+            <!-- Seat Grid -->
+            <div class="seat-grid">
+                {% for row_data in seat_matrix %}
+                    <div class="seat-row">
+                        <span class="row-label">{{ row_data.row }}</span>
+                        <div class="row-seats">
+                            {% for seat in row_data.seats %}
+                                <button type="button" 
+                                        class="seat-btn {% if seat.is_booked %}booked{% else %}available{% endif %}"
+                                        data-seat="{{ seat.code }}"
+                                        {% if seat.is_booked %}disabled title="Seat {{ seat.code }} is already booked"{% else %}onclick="toggleSeatSelection(this)"{% endif %}>
+                                    {{ seat.code }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Booking Summary Sidebar -->
+        <div class="booking-summary-card">
+            <h3>Booking Summary</h3>
+            
+            <div class="summary-details">
+                <div class="summary-row">
+                    <span>Movie:</span>
+                    <strong>{{ movie.title }}</strong>
+                </div>
+                <div class="summary-row">
+                    <span>Screen:</span>
+                    <strong>{{ show.screen_name }}</strong>
+                </div>
+                <div class="summary-row">
+                    <span>Price per Ticket:</span>
+                    <strong>₹<span id="ticket-price-val">{{ show.ticket_price }}</span></strong>
+                </div>
+                <hr class="summary-divider">
+                <div class="summary-row">
+                    <span>Selected Seats:</span>
+                    <strong id="selected-seats-display" class="highlight-seats">None</strong>
+                </div>
+                <div class="summary-row total-row">
+                    <span>Total Amount:</span>
+                    <strong class="total-amount">₹<span id="total-amount-display">0.00</span></strong>
+                </div>
+            </div>
+
+            <form method="POST" action="{% url 'book_ticket' show.id %}" id="booking-form">
+                {% csrf_token %}
+                <input type="hidden" name="selected_seats" id="selected-seats-input" value="">
+                <button type="submit" id="confirm-booking-btn" class="btn btn-primary btn-block mt-3" disabled>
+                    Confirm & Pay ₹<span id="btn-amount-display">0</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ticketPrice = parseFloat("{{ show.ticket_price }}");
+    let selectedSeats = [];
+
+    function toggleSeatSelection(btn) {
+        const seatCode = btn.getAttribute('data-seat');
+        
+        if (btn.classList.contains('selected')) {
+            btn.classList.remove('selected');
+            selectedSeats = selectedSeats.filter(s => s !== seatCode);
+        } else {
+            btn.classList.add('selected');
+            selectedSeats.push(seatCode);
+        }
+
+        updateSummary();
+    }
+
+    function updateSummary() {
+        const selectedDisplay = document.getElementById('selected-seats-display');
+        const totalDisplay = document.getElementById('total-amount-display');
+        const btnAmountDisplay = document.getElementById('btn-amount-display');
+        const seatsInput = document.getElementById('selected-seats-input');
+        const confirmBtn = document.getElementById('confirm-booking-btn');
+
+        if (selectedSeats.length > 0) {
+            selectedDisplay.textContent = selectedSeats.join(', ');
+            const total = selectedSeats.length * ticketPrice;
+            totalDisplay.textContent = total.toFixed(2);
+            btnAmountDisplay.textContent = total.toFixed(2);
+            seatsInput.value = selectedSeats.join(',');
+            confirmBtn.disabled = false;
+        } else {
+            selectedDisplay.textContent = 'None';
+            totalDisplay.textContent = '0.00';
+            btnAmountDisplay.textContent = '0';
+            seatsInput.value = '';
+            confirmBtn.disabled = true;
+        }
+    }
+</script>
+{% endblock %}

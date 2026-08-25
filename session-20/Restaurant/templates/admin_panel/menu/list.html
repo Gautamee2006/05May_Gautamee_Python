@@ -1,0 +1,138 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Restaurant Selector -->
+    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row sm:items-center gap-4">
+        <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Select Restaurant:</span>
+        <form method="get" class="flex gap-3 flex-grow">
+            <select name="restaurant" onchange="this.form.submit()" class="flex-grow px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                {% for rest in restaurants %}
+                <option value="{{ rest.id }}" {% if selected_restaurant.id == rest.id %}selected{% endif %}>{{ rest.name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    {% if selected_restaurant %}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Categories Panel -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-amber-100 dark:border-slate-700">
+                <h3 class="font-display font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-amber-500"></i> Categories
+                </h3>
+            </div>
+            <div class="divide-y divide-slate-100 dark:divide-slate-700/60">
+                {% for cat in categories %}
+                <div class="px-5 py-3 flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ cat.name }}</span>
+                    <form action="{% url 'panel_category_delete' cat.id %}" method="post" onsubmit="return confirm('Delete category {{ cat.name }}?')">
+                        {% csrf_token %}
+                        <button type="submit" class="text-rose-500 hover:text-rose-700 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </form>
+                </div>
+                {% empty %}
+                <p class="px-5 py-6 text-xs text-center text-slate-400">No categories yet. Add one below.</p>
+                {% endfor %}
+            </div>
+            <!-- Add Category Form -->
+            <div class="px-5 py-4 border-t border-amber-100 dark:border-slate-700 bg-amber-50/50 dark:bg-slate-700/30">
+                <form action="{% url 'panel_category_add' %}" method="post" class="space-y-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="restaurant" value="{{ selected_restaurant.id }}">
+                    <input type="text" name="name" placeholder="Category name..." required class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                    <button type="submit" class="w-full px-4 py-2 rounded-lg bg-warm-600 hover:bg-warm-700 text-white font-bold text-xs transition-colors">
+                        + Add Category
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Food Items Panel -->
+        <div class="lg:col-span-2 space-y-4">
+            {% for cat in categories %}
+            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div class="px-5 py-3 border-b border-amber-100 dark:border-slate-700 bg-amber-50/40 dark:bg-slate-700/30 flex items-center justify-between">
+                    <h4 class="font-bold text-sm text-slate-800 dark:text-white">{{ cat.name }}</h4>
+                    <span class="text-[10px] text-slate-400">{{ cat.items.count }} items</span>
+                </div>
+                <div class="divide-y divide-slate-100 dark:divide-slate-700/60">
+                    {% for item in cat.items.all %}
+                    <div class="px-5 py-3 flex items-center gap-4">
+                        {% if item.image %}
+                        <img src="{{ item.image }}" alt="{{ item.name }}" class="w-12 h-12 rounded-xl object-cover flex-shrink-0">
+                        {% else %}
+                        <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-slate-700 flex items-center justify-center text-warm-500 flex-shrink-0">
+                            <i class="fa-solid fa-utensils"></i>
+                        </div>
+                        {% endif %}
+                        <div class="flex-grow min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-sm border-2 {% if item.is_vegetarian %}border-emerald-600{% else %}border-rose-600{% endif %} flex items-center justify-center flex-shrink-0">
+                                    <span class="w-1.5 h-1.5 rounded-full {% if item.is_vegetarian %}bg-emerald-600{% else %}bg-rose-600{% endif %}"></span>
+                                </span>
+                                <p class="font-bold text-xs text-slate-900 dark:text-white truncate">{{ item.name }}</p>
+                            </div>
+                            <p class="text-xs font-bold text-warm-600 dark:text-warm-400 mt-0.5">${{ item.price }}</p>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <form action="{% url 'panel_food_item_toggle' item.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors {% if item.is_available %}bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 hover:bg-emerald-200{% else %}bg-rose-100 text-rose-600 dark:bg-rose-950/40 hover:bg-rose-200{% endif %}">
+                                    {% if item.is_available %}✓ Available{% else %}✗ Unavailable{% endif %}
+                                </button>
+                            </form>
+                            <a href="{% url 'panel_food_item_edit' item.id %}" class="px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-bold text-[10px] hover:bg-blue-100 transition-colors">Edit</a>
+                            <form action="{% url 'panel_food_item_delete' item.id %}" method="post" onsubmit="return confirm('Delete {{ item.name }}?')">
+                                {% csrf_token %}
+                                <button type="submit" class="px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold text-[10px] hover:bg-rose-100 transition-colors">Del</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="px-5 py-3 text-xs text-slate-400">No items in this category.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Add Food Item -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-amber-300 dark:border-amber-700 shadow-sm p-5">
+                <h4 class="font-display font-bold text-sm text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-plus-circle text-warm-500"></i> Add Food Item
+                </h4>
+                <form action="{% url 'panel_food_item_add' %}" method="post" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {% csrf_token %}
+                    <input type="hidden" name="restaurant" value="{{ selected_restaurant.id }}">
+                    <div class="sm:col-span-2">
+                        <input type="text" name="name" placeholder="Item name *" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                    </div>
+                    <select name="category" required class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                        {% for cat in categories %}<option value="{{ cat.id }}">{{ cat.name }}</option>{% endfor %}
+                    </select>
+                    <input type="number" name="price" placeholder="Price *" step="0.01" min="0" required class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                    <div class="sm:col-span-2">
+                        <textarea name="description" rows="2" placeholder="Description..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500"></textarea>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <input type="text" name="image" placeholder="Image URL..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                            <input type="checkbox" name="is_vegetarian" checked class="w-4 h-4 text-emerald-600"> Vegetarian
+                        </label>
+                        <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                            <input type="checkbox" name="is_available" checked class="w-4 h-4 text-warm-600"> Available
+                        </label>
+                    </div>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-warm-600 hover:bg-warm-700 text-white font-bold text-xs transition-colors">Add Item</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

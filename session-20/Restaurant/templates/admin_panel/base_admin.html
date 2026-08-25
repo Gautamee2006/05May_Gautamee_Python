@@ -1,0 +1,293 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ page_title }} — TasteTrail Admin{% endblock %}</title>
+    
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        warm: {
+                            50: '#fffaf5', 100: '#fef3e6', 200: '#fce4c8',
+                            300: '#f9cc9c', 400: '#f5aa68', 500: '#f18235',
+                            600: '#e2631a', 700: '#bd4914', 800: '#973a17', 900: '#7a3217',
+                        },
+                        terracotta: '#d9534f',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root { --sidebar-width: 260px; }
+        .sidebar { width: var(--sidebar-width); transition: transform 0.3s ease; }
+        .main-content { margin-left: var(--sidebar-width); transition: margin 0.3s ease; }
+        @media (max-width: 1023px) {
+            .sidebar { transform: translateX(-100%); position: fixed; z-index: 50; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+        }
+        .nav-item { transition: all 0.2s ease; }
+        .nav-item:hover, .nav-item.active { background: rgba(226, 99, 26, 0.12); border-radius: 10px; color: #e2631a; }
+        .nav-item.active { font-weight: 700; border-left: 3px solid #e2631a; }
+        .stat-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -10px rgba(226,99,26,0.15); }
+        .table-row { transition: background 0.15s ease; }
+        .table-row:hover { background: rgba(241, 130, 53, 0.05); }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-in { animation: slideIn 0.35s ease forwards; }
+        .badge-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .dark .nav-item:hover, .dark .nav-item.active { background: rgba(241, 130, 53, 0.15); }
+    </style>
+
+    <!-- Prevent flash -->
+    <script>
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</head>
+<body class="font-sans bg-amber-50/40 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen">
+    
+    <!-- SIDEBAR OVERLAY (Mobile) -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden" onclick="closeSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar fixed top-0 left-0 h-full bg-white dark:bg-slate-900 border-r border-amber-100 dark:border-slate-700/60 flex flex-col shadow-xl z-50">
+        
+        <!-- Brand -->
+        <div class="px-6 py-5 border-b border-amber-100 dark:border-slate-700/60">
+            <a href="{% url 'panel_dashboard' %}" class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-warm-500 to-terracotta flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid fa-utensils text-lg"></i>
+                </div>
+                <div>
+                    <span class="font-display font-extrabold text-lg bg-gradient-to-r from-warm-600 to-terracotta bg-clip-text text-transparent block leading-none">TasteTrail</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Admin Panel</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-grow overflow-y-auto px-3 py-4 space-y-1">
+
+            <a href="{% url 'panel_dashboard' %}" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-300 {% if active_nav == 'dashboard' %}active{% endif %}">
+                <i class="fa-solid fa-gauge-high w-5 text-center text-warm-500"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <div class="pt-3 pb-1">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3">Restaurant</span>
+            </div>
+
+            <a href="{% url 'panel_restaurant_list' %}" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-300 {% if active_nav == 'restaurants' %}active{% endif %}">
+                <i class="fa-solid fa-store w-5 text-center text-amber-500"></i>
+                <span>Restaurants</span>
+            </a>
+
+            <a href="{% url 'panel_menu_list' %}" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-300 {% if active_nav == 'menu' %}active{% endif %}">
+                <i class="fa-solid fa-book-open w-5 text-center text-emerald-500"></i>
+                <span>Menu Management</span>
+            </a>
+
+            <div class="pt-3 pb-1">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3">Operations</span>
+            </div>
+
+            <a href="{% url 'panel_order_list' %}" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-300 {% if active_nav == 'orders' %}active{% endif %}">
+                <i class="fa-solid fa-bag-shopping w-5 text-center text-blue-500"></i>
+                <span>Orders</span>
+            </a>
+
+            <a href="{% url 'panel_reservation_list' %}" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-300 {% if active_nav == 'reservations' %}active{% endif %}">
+                <i class="fa-solid fa-chair w-5 text-center text-purple-500"></i>
+                <span>Reservations</span>
+            </a>
+
+            <div class="pt-3 pb-1">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3">People & Content</span>
+            </div>
+
+            <a href="{% url 'panel_customer_list' %}" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-300 {% if active_nav == 'customers' %}active{% endif %}">
+                <i class="fa-solid fa-users w-5 text-center text-sky-500"></i>
+                <span>Customers</span>
+            </a>
+
+            <a href="{% url 'panel_review_list' %}" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-300 {% if active_nav == 'reviews' %}active{% endif %}">
+                <i class="fa-solid fa-star w-5 text-center text-amber-400"></i>
+                <span>Reviews & Ratings</span>
+            </a>
+
+            <a href="{% url 'panel_offer_list' %}" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-300 {% if active_nav == 'offers' %}active{% endif %}">
+                <i class="fa-solid fa-tags w-5 text-center text-rose-500"></i>
+                <span>Offers & Coupons</span>
+            </a>
+
+            <a href="{% url 'panel_location_list' %}" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-300 {% if active_nav == 'locations' %}active{% endif %}">
+                <i class="fa-solid fa-location-dot w-5 text-center text-green-500"></i>
+                <span>Cuisines & Locations</span>
+            </a>
+
+            <div class="pt-3 pb-1">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3">Insights</span>
+            </div>
+
+            <a href="{% url 'panel_analytics' %}" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-300 {% if active_nav == 'analytics' %}active{% endif %}">
+                <i class="fa-solid fa-chart-bar w-5 text-center text-indigo-500"></i>
+                <span>Analytics</span>
+            </a>
+        </nav>
+
+        <!-- Bottom: Back to Site -->
+        <div class="px-4 py-4 border-t border-amber-100 dark:border-slate-700/60 space-y-2">
+            <a href="{% url 'home' %}" target="_blank" class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-slate-800 transition-colors">
+                <i class="fa-solid fa-arrow-up-right-from-square text-warm-500"></i> View Live Site
+            </a>
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="main-content min-h-screen flex flex-col">
+
+        <!-- TOP HEADER BAR -->
+        <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-amber-100 dark:border-slate-700/60 px-6 py-3 flex items-center justify-between gap-4 shadow-sm">
+            
+            <!-- Left: Mobile menu toggle + Breadcrumb -->
+            <div class="flex items-center gap-4">
+                <button id="mobile-menu-btn" onclick="toggleSidebar()" class="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-slate-800 transition-colors">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                <div>
+                    <h1 class="font-display font-bold text-lg text-slate-900 dark:text-white leading-none">{{ page_title }}</h1>
+                    <p class="text-[11px] text-slate-400 mt-0.5">TasteTrail Admin Panel</p>
+                </div>
+            </div>
+
+            <!-- Right: Theme toggle + Admin info -->
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()" class="p-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" title="Toggle Theme">
+                    <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+                <a href="{% url 'panel_dashboard' %}" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-200 dark:border-slate-700 bg-amber-50 dark:bg-slate-800">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-r from-warm-500 to-amber-500 flex items-center justify-center text-white text-xs font-bold">
+                        {{ request.user.username|slice:":1"|upper }}
+                    </div>
+                    <span class="text-xs font-semibold text-slate-800 dark:text-slate-100 hidden sm:block">{{ request.user.get_full_name|default:request.user.username }}</span>
+                    <span class="text-[10px] font-bold text-warm-600 dark:text-warm-400 hidden sm:block">Staff</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- FLASH MESSAGES -->
+        {% if messages %}
+        <div class="px-6 pt-4 space-y-2">
+            {% for message in messages %}
+            <div class="toast-msg flex items-center justify-between p-4 rounded-2xl shadow border text-sm font-medium animate-slide-in
+                {% if message.tags == 'success' %} bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/80 dark:text-emerald-200 dark:border-emerald-700
+                {% elif message.tags == 'error' %} bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/80 dark:text-rose-200 dark:border-rose-700
+                {% elif message.tags == 'warning' %} bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/80 dark:text-amber-200 dark:border-amber-700
+                {% else %} bg-sky-50 text-sky-800 border-sky-200 dark:bg-sky-950/80 dark:text-sky-200 dark:border-sky-700 {% endif %}">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check text-emerald-500{% elif message.tags == 'error' %}fa-circle-xmark text-rose-500{% elif message.tags == 'warning' %}fa-triangle-exclamation text-amber-500{% else %}fa-circle-info text-sky-500{% endif %} text-lg"></i>
+                    {{ message }}
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- PAGE CONTENT -->
+        <main class="flex-grow p-6 animate-slide-in">
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="px-6 py-4 border-t border-amber-100 dark:border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+            <span>&copy; 2026 TasteTrail Admin Panel. All rights reserved.</span>
+            <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-circle text-emerald-500 text-[8px] badge-pulse"></i> System Online
+            </span>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle
+        function updateThemeIcon() {
+            const isDark = document.documentElement.classList.contains('dark');
+            document.getElementById('theme-icon').className = isDark
+                ? 'fa-solid fa-sun text-lg text-amber-400'
+                : 'fa-solid fa-moon text-lg';
+        }
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+            updateThemeIcon();
+        }
+        updateThemeIcon();
+
+        // Sidebar
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
+        }
+        function closeSidebar() {
+            document.querySelector('.sidebar').classList.remove('open');
+            document.getElementById('sidebar-overlay').classList.add('hidden');
+        }
+
+        // Auto dismiss toasts
+        setTimeout(() => {
+            document.querySelectorAll('.toast-msg').forEach(el => {
+                el.style.transition = 'opacity 0.5s';
+                el.style.opacity = '0';
+                setTimeout(() => el.remove(), 500);
+            });
+        }, 5000);
+
+        // Confirm delete helper
+        function confirmDelete(form, itemName) {
+            if (confirm(`Delete "${itemName}"? This cannot be undone.`)) {
+                form.submit();
+            }
+        }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

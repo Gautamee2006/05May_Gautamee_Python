@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Coupons - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 my-4">
+    <div class="row g-4">
+        <!-- Coupon Form -->
+        <div class="col-lg-4">
+            <div class="qc-dashboard-card">
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-plus text-primary me-1"></i> Create New Coupon</h5>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3"><label class="form-label fw-semibold">Coupon Code</label>{{ form.code }}</div>
+                    <div class="mb-3"><label class="form-label fw-semibold">Discount Type</label>{{ form.discount_type }}</div>
+                    <div class="mb-3"><label class="form-label fw-semibold">Discount Value</label>{{ form.discount_value }}</div>
+                    <div class="mb-3"><label class="form-label fw-semibold">Min Order Amount (₹)</label>{{ form.min_order_amount }}</div>
+                    <div class="mb-3"><label class="form-label fw-semibold">Usage Limit</label>{{ form.usage_limit }}</div>
+                    <div class="mb-3"><label class="form-label fw-semibold">Expiry Date</label>{{ form.expiry_date }}</div>
+                    <div class="form-check mb-4">
+                        {{ form.is_active }}
+                        <label class="form-check-label fw-semibold">Active Status</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary rounded-pill fw-bold w-100">Create Coupon</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Coupons Table -->
+        <div class="col-lg-8">
+            <div class="qc-dashboard-card">
+                <h5 class="fw-bold mb-3">Active & Inactive Coupons</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Code</th>
+                                <th>Discount</th>
+                                <th>Min Order</th>
+                                <th>Usage</th>
+                                <th>Expiry</th>
+                                <th>Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in coupons %}
+                                <tr>
+                                    <td class="fw-bold text-primary font-monospace">{{ c.code }}</td>
+                                    <td>
+                                        {% if c.discount_type == 'percentage' %}{{ c.discount_value|stringformat:".0f" }}%{% else %}₹{{ c.discount_value }}{% endif %}
+                                    </td>
+                                    <td>₹{{ c.min_order_amount }}</td>
+                                    <td>{{ c.usages.count }} / {{ c.usage_limit }}</td>
+                                    <td class="small">{{ c.expiry_date|date:"d M Y" }}</td>
+                                    <td>
+                                        {% if c.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{% url 'dashboard:delete_coupon' c.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete coupon?')"><i class="fa-solid fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

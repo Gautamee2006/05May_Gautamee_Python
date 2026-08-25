@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Gateway - QuickCart{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-lg rounded-4 p-4 text-center">
+                <div class="mb-3">
+                    <i class="fa-solid fa-shield-halved display-3 text-primary mb-2"></i>
+                    <h3 class="fw-bold">Secure Online Payment</h3>
+                    <p class="text-muted small">Simulated Payment Gateway Environment</p>
+                </div>
+
+                <div class="bg-light p-3 rounded-3 mb-4 text-start">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Order ID:</span>
+                        <span class="fw-bold">{{ order.order_id }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Payment ID:</span>
+                        <span class="fw-semibold">{{ payment.payment_id }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Amount Due:</span>
+                        <span class="fw-extrabold text-success fs-5">₹{{ order.total_amount }}</span>
+                    </div>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" name="action" value="success" class="btn btn-success btn-lg fw-bold rounded-pill shadow-sm">
+                            <i class="fa-solid fa-circle-check me-2"></i> Simulate Successful Payment
+                        </button>
+                        <button type="submit" name="action" value="fail" class="btn btn-outline-danger rounded-pill fw-semibold">
+                            <i class="fa-solid fa-circle-xmark me-2"></i> Simulate Payment Failure
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

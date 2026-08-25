@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}User Registration - CineTicket{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Create Account</h2>
+            <p>Register to book movie tickets instantly</p>
+        </div>
+
+        <form method="POST" action="{% url 'register' %}" class="auth-form">
+            {% csrf_token %}
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.first_name.id_for_label }}">First Name *</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <div class="field-error">{{ form.first_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.last_name.id_for_label }}">Last Name *</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <div class="field-error">{{ form.last_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">Email Address *</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="field-error">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password.id_for_label }}">Password *</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="field-error">{{ form.password.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.confirm_password.id_for_label }}">Confirm Password *</label>
+                {{ form.confirm_password }}
+                {% if form.confirm_password.errors %}
+                    <div class="field-error">{{ form.confirm_password.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block mt-3">Register Account</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{% url 'login' %}">Log in here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

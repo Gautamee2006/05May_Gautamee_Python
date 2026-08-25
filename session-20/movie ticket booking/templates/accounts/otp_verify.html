@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}OTP Verification - CineTicket{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card otp-card">
+        <div class="auth-header">
+            <h2>🔒 Security OTP Verification</h2>
+            <p>A 6-digit verification OTP code has been sent directly to your email inbox: <strong>{{ user.email }}</strong></p>
+
+
+        </div>
+
+        <div class="otp-timer-banner">
+            <span>⏱️ Code expires in: </span>
+            <strong id="otp-timer" class="timer-countdown">03:00</strong>
+        </div>
+
+        <form method="POST" action="{% url 'verify_otp' %}" class="auth-form">
+            {% csrf_token %}
+
+            <div class="form-group text-center">
+                <label for="{{ form.otp.id_for_label }}">Enter 6-Digit OTP</label>
+                {{ form.otp }}
+                {% if form.otp.errors %}
+                    <div class="field-error">{{ form.otp.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block mt-3">Verify & Access Dashboard &rarr;</button>
+        </form>
+
+        <div class="otp-meta-info">
+            <p class="attempts-info">Attempts used: <strong>{{ otp_obj.attempts }} / 3</strong></p>
+            
+            <div class="resend-box">
+                <p>Didn't receive the OTP or expired?</p>
+                <a href="{% url 'resend_otp' %}" class="btn btn-outline-secondary btn-sm mt-1">Resend New OTP</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Countdown Timer logic for 3 minutes (180s)
+    const expiresAtStr = "{{ otp_obj.expires_at|date:'c' }}";
+    const timerElement = document.getElementById('otp-timer');
+
+    function updateCountdown() {
+        if (!expiresAtStr) return;
+        const expiresTime = new Date(expiresAtStr).getTime();
+        const now = new Date().getTime();
+        const diff = expiresTime - now;
+
+        if (diff <= 0) {
+            timerElement.textContent = "EXPIRED";
+            timerElement.style.color = "#ef4444";
+        } else {
+            const minutes = Math.floor(diff / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+</script>
+{% endblock %}

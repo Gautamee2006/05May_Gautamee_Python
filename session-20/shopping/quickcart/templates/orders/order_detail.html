@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Details #{{ order.order_id }} - QuickCart{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    
+    <!-- Top Header -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h4 class="fw-bold mb-1">Order #{{ order.order_id }}</h4>
+                <p class="text-muted small mb-0">Placed on {{ order.created_at|date:"d M Y, h:i A" }}</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'orders:invoice' order.order_id %}" target="_blank" class="btn btn-outline-dark rounded-pill btn-sm fw-semibold">
+                    <i class="fa-solid fa-file-invoice me-1"></i> Invoice
+                </a>
+                {% if order.can_cancel %}
+                    <a href="{% url 'orders:cancel_order' order.order_id %}" class="btn btn-outline-danger rounded-pill btn-sm fw-semibold" onclick="return confirm('Are you sure you want to cancel this order?')">
+                        Cancel Order
+                    </a>
+                {% endif %}
+                {% if order.can_return %}
+                    <a href="{% url 'orders:return_product' order.order_id %}" class="btn btn-warning rounded-pill btn-sm fw-bold text-dark">
+                        Request Return
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tracking Stepper -->
+        <hr class="my-4">
+        <h6 class="fw-bold mb-3"><i class="fa-solid fa-truck-ramp-box text-primary me-2"></i> Order Tracking Timeline</h6>
+        <div class="d-flex justify-content-between align-items-center position-relative my-3 text-center">
+            <div class="flex-fill">
+                <div class="badge rounded-circle p-3 {% if order.order_status in 'Placed Confirmed Packed Shipped Out for Delivery Delivered' %}bg-success{% else %}bg-secondary{% endif %} text-white fs-5">
+                    <i class="fa-solid fa-cart-check"></i>
+                </div>
+                <div class="small fw-semibold mt-1">Placed</div>
+            </div>
+            <div class="flex-fill">
+                <div class="badge rounded-circle p-3 {% if order.order_status in 'Confirmed Packed Shipped Out for Delivery Delivered' %}bg-success{% else %}bg-secondary{% endif %} text-white fs-5">
+                    <i class="fa-solid fa-boxes-packing"></i>
+                </div>
+                <div class="small fw-semibold mt-1">Packed</div>
+            </div>
+            <div class="flex-fill">
+                <div class="badge rounded-circle p-3 {% if order.order_status in 'Shipped Out for Delivery Delivered' %}bg-success{% else %}bg-secondary{% endif %} text-white fs-5">
+                    <i class="fa-solid fa-truck"></i>
+                </div>
+                <div class="small fw-semibold mt-1">Shipped</div>
+            </div>
+            <div class="flex-fill">
+                <div class="badge rounded-circle p-3 {% if order.order_status == 'Delivered' %}bg-success{% else %}bg-secondary{% endif %} text-white fs-5">
+                    <i class="fa-solid fa-house-chimney-user"></i>
+                </div>
+                <div class="small fw-semibold mt-1">Delivered</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Items & Summary Grid -->
+    <div class="row g-4">
+        <!-- Items Table -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h5 class="fw-bold mb-3">Order Items</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Unit Price</th>
+                                <th>Quantity</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            {% if item.product and item.product.main_image %}
+                                                <img src="{{ item.product.main_image.url }}" alt="{{ item.product_name }}" style="width: 50px; height: 50px; object-fit: contain;">
+                                            {% endif %}
+                                            <div>
+                                                {% if item.product %}
+                                                    <a href="{% url 'products:product_detail' item.product.slug %}" class="fw-semibold text-dark text-decoration-none">{{ item.product_name }}</a>
+                                                {% else %}
+                                                    <span class="fw-semibold">{{ item.product_name }}</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>₹{{ item.final_price }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td class="text-end fw-bold">₹{{ item.item_total }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Address & Payment Sidebar -->
+        <div class="col-lg-4">
+            <!-- Delivery Address Card -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-3">
+                <h6 class="fw-bold mb-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> Delivery Address</h6>
+                <p class="small text-muted mb-0" style="white-space: pre-line;">{{ order.address_snapshot }}</p>
+            </div>
+
+            <!-- Payment Summary Card -->
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-receipt me-1 text-primary"></i> Payment Details</h6>
+
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span class="text-muted">Payment Status</span>
+                    <span class="badge bg-info text-dark">{{ order.payment_status }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span class="text-muted">Discount Applied</span>
+                    <span class="text-success">- ₹{{ order.discount }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span class="text-muted">Delivery Charge</span>
+                    <span>₹{{ order.delivery_charge }}</span>
+                </div>
+
+                <hr class="my-2">
+
+                <div class="d-flex justify-content-between">
+                    <span class="fw-bold">Total Paid</span>
+                    <span class="fw-extrabold text-primary fs-5">₹{{ order.total_amount }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

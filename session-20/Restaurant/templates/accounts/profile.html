@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - TasteTrail{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-12">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-xl border border-slate-100 dark:border-slate-700 space-y-6">
+        <div class="flex items-center gap-4 pb-6 border-b border-slate-100 dark:border-slate-700">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-warm-500 to-amber-500 flex items-center justify-center text-white text-2xl font-bold shadow-md">
+                {{ user.username|slice:":1"|upper }}
+            </div>
+            <div>
+                <h2 class="font-display font-extrabold text-2xl text-slate-900 dark:text-white">{{ user.get_full_name|default:user.username }}</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Manage your contact info & delivery address</p>
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'profile' %}" class="space-y-4">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">First Name</label>
+                    {{ form.first_name }}
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Last Name</label>
+                    {{ form.last_name }}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
+                    {{ form.email }}
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Mobile Phone</label>
+                    {{ form.mobile }}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Default Delivery Address</label>
+                    {{ form.address }}
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">City</label>
+                    {{ form.city }}
+                </div>
+            </div>
+
+            <div class="pt-4">
+                <button type="submit" class="px-8 py-3 rounded-2xl bg-warm-600 hover:bg-warm-700 text-white font-bold text-xs shadow-md transition-colors">
+                    Save Profile Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'admin_panel/base_admin.html' %}
+{% block content %}
+<div class="max-w-2xl">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b border-amber-100 dark:border-slate-700 flex items-center justify-between">
+            <h2 class="font-display font-bold text-lg text-slate-900 dark:text-white">{% if offer %}Edit Offer{% else %}Add New Offer{% endif %}</h2>
+            <a href="{% url 'panel_offer_list' %}" class="text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 flex items-center gap-1">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+        </div>
+        <form method="post" action="{% if offer %}{% url 'panel_offer_edit' offer.id %}{% else %}{% url 'panel_offer_add' %}{% endif %}" class="p-6 space-y-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Offer Title *</label>
+                <input type="text" name="title" value="{{ offer.title|default:'' }}" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm outline-none focus:ring-2 focus:ring-warm-500 dark:text-slate-100">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Description</label>
+                <textarea name="description" rows="2" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm outline-none focus:ring-2 focus:ring-warm-500 dark:text-slate-100">{{ offer.description|default:'' }}</textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Coupon Code *</label>
+                    <input type="text" name="coupon_code" value="{{ offer.coupon_code|default:'' }}" required placeholder="e.g. SAVE20" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm font-mono uppercase outline-none focus:ring-2 focus:ring-warm-500 dark:text-slate-100">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Discount % *</label>
+                    <input type="number" name="discount_percentage" value="{{ offer.discount_percentage|default:10 }}" min="1" max="100" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm outline-none focus:ring-2 focus:ring-warm-500 dark:text-slate-100">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Start Date *</label>
+                    <input type="date" name="start_date" value="{{ offer.start_date|date:'Y-m-d'|default:'' }}" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm outline-none focus:ring-2 focus:ring-warm-500 dark:text-slate-100">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">End Date *</label>
+                    <input type="date" name="end_date" value="{{ offer.end_date|date:'Y-m-d'|default:'' }}" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm outline-none focus:ring-2 focus:ring-warm-500 dark:text-slate-100">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Restaurant (leave blank for site-wide)</label>
+                <select name="restaurant" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm outline-none focus:ring-2 focus:ring-warm-500 dark:text-slate-100">
+                    <option value="">— Site-wide (All Restaurants) —</option>
+                    {% for rest in restaurants %}
+                    <option value="{{ rest.id }}" {% if offer.restaurant.id == rest.id %}selected{% endif %}>{{ rest.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex items-center gap-3">
+                <input type="checkbox" name="is_active" id="is_active_offer" {% if not offer or offer.is_active %}checked{% endif %} class="w-5 h-5 rounded text-warm-600">
+                <label for="is_active_offer" class="text-sm font-semibold text-slate-700 dark:text-slate-300">Offer is Active</label>
+            </div>
+            <div class="flex gap-3 pt-4 border-t border-slate-100 dark:border-slate-700">
+                <button type="submit" class="px-8 py-3 rounded-xl bg-warm-600 hover:bg-warm-700 text-white font-bold text-sm shadow-md transition-colors">
+                    {% if offer %}Update Offer{% else %}Create Offer{% endif %}
+                </button>
+                <a href="{% url 'panel_offer_list' %}" class="px-6 py-3 rounded-xl border border-slate-200 dark:border-slate-600 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

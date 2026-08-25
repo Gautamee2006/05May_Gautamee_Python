@@ -1,0 +1,102 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block content %}
+<div class="max-w-3xl">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b border-amber-100 dark:border-slate-700 flex items-center justify-between">
+            <h2 class="font-display font-bold text-lg text-slate-900 dark:text-white">
+                {% if restaurant %}Edit Restaurant{% else %}Add New Restaurant{% endif %}
+            </h2>
+            <a href="{% url 'panel_restaurant_list' %}" class="text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 flex items-center gap-1">
+                <i class="fa-solid fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+
+        <form method="post" action="{% if restaurant %}{% url 'panel_restaurant_edit' restaurant.id %}{% else %}{% url 'panel_restaurant_add' %}{% endif %}" class="p-6 space-y-5">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Restaurant Name *</label>
+                    <input type="text" name="name" value="{{ restaurant.name|default:'' }}" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Cuisine *</label>
+                    <select name="cuisine" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                        {% for c in cuisines %}
+                        <option value="{{ c.id }}" {% if restaurant.cuisine.id == c.id %}selected{% endif %}>{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Location *</label>
+                    <select name="location" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                        {% for l in locations %}
+                        <option value="{{ l.id }}" {% if restaurant.location.id == l.id %}selected{% endif %}>{{ l.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Address</label>
+                    <input type="text" name="address" value="{{ restaurant.address|default:'' }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Phone</label>
+                    <input type="text" name="phone" value="{{ restaurant.phone|default:'' }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Email</label>
+                    <input type="email" name="email" value="{{ restaurant.email|default:'' }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Description</label>
+                    <textarea name="description" rows="3" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">{{ restaurant.description|default:'' }}</textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Opening Time</label>
+                    <input type="time" name="opening_time" value="{{ restaurant.opening_time|time:'H:i'|default:'09:00' }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Closing Time</label>
+                    <input type="time" name="closing_time" value="{{ restaurant.closing_time|time:'H:i'|default:'23:00' }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Price Range</label>
+                    <select name="price_range" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                        <option value="$" {% if restaurant.price_range == '$' %}selected{% endif %}>Budget ($)</option>
+                        <option value="$$" {% if restaurant.price_range == '$$' or not restaurant %}selected{% endif %}>Moderate ($$)</option>
+                        <option value="$$$" {% if restaurant.price_range == '$$$' %}selected{% endif %}>Expensive ($$$)</option>
+                        <option value="$$$$" {% if restaurant.price_range == '$$$$' %}selected{% endif %}>Luxury ($$$$)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Image URL</label>
+                    <input type="text" name="image" value="{{ restaurant.image|default:'' }}" placeholder="https://..." class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                </div>
+
+                <div class="sm:col-span-2 flex items-center gap-3">
+                    <input type="checkbox" name="is_active" id="is_active" {% if not restaurant or restaurant.is_active %}checked{% endif %} class="w-5 h-5 rounded text-warm-600">
+                    <label for="is_active" class="text-sm font-semibold text-slate-700 dark:text-slate-300">Restaurant is Active (visible on site)</label>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-700">
+                <button type="submit" class="px-8 py-3 rounded-xl bg-warm-600 hover:bg-warm-700 text-white font-bold text-sm shadow-md transition-colors">
+                    {% if restaurant %}Update Restaurant{% else %}Add Restaurant{% endif %}
+                </button>
+                <a href="{% url 'panel_restaurant_list' %}" class="px-6 py-3 rounded-xl border border-slate-200 dark:border-slate-600 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

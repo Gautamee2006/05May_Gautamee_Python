@@ -1,0 +1,207 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}QuickCart - Ultimate Online Shopping Platform{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- QuickCart Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <header class="qc-navbar">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                
+                <!-- Brand Logo -->
+                <a href="{% url 'home' %}" class="qc-brand">
+                    <i class="fa-solid fa-bolt text-warning"></i> Quick<span>Cart</span>
+                </a>
+
+                <!-- Search Bar -->
+                <form action="{% url 'products:search' %}" method="GET" class="flex-grow-1 mx-lg-4 max-w-600" style="max-width: 550px;">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control qc-search-input" placeholder="Search for products, brands, categories..." value="{{ request.GET.q|default:'' }}" required>
+                        <button class="btn qc-search-btn" type="submit">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Navigation Links -->
+                <div class="d-flex align-items-center gap-3">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'cart:wishlist' %}" class="qc-nav-link text-white" title="Wishlist">
+                            <i class="fa-regular fa-heart fs-5"></i>
+                            <span class="d-none d-md-inline">Wishlist</span>
+                            {% if wishlist_count > 0 %}
+                                <span class="qc-badge">{{ wishlist_count }}</span>
+                            {% endif %}
+                        </a>
+
+                        <a href="{% url 'cart:cart' %}" class="qc-nav-link text-white" title="Cart">
+                            <i class="fa-solid fa-cart-shopping fs-5"></i>
+                            <span class="d-none d-md-inline">Cart</span>
+                            {% if cart_count > 0 %}
+                                <span class="qc-badge">{{ cart_count }}</span>
+                            {% endif %}
+                        </a>
+
+                        <a href="{% url 'notifications:list' %}" class="qc-nav-link text-white" title="Notifications">
+                            <i class="fa-regular fa-bell fs-5"></i>
+                            {% if unread_notifications_count > 0 %}
+                                <span class="qc-badge bg-danger">{{ unread_notifications_count }}</span>
+                            {% endif %}
+                        </a>
+
+                        <!-- User Profile Dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-light dropdown-toggle rounded-pill px-3 py-1 fw-semibold d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                                <i class="fa-regular fa-circle-user fs-5"></i>
+                                <span>{{ user.first_name|default:user.username }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                                <li><a class="dropdown-item py-2" href="{% url 'accounts:profile' %}"><i class="fa-solid fa-user me-2 text-primary"></i> My Profile</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'orders:my_orders' %}"><i class="fa-solid fa-box me-2 text-success"></i> My Orders</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'coupons:coupons_list' %}"><i class="fa-solid fa-ticket me-2 text-warning"></i> My Coupons</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'support:tickets' %}"><i class="fa-solid fa-headset me-2 text-info"></i> Support Tickets</a></li>
+                                {% if user.is_staff %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item py-2 fw-bold text-danger" href="{% url 'dashboard:home' %}"><i class="fa-solid fa-chart-line me-2"></i> Admin Dashboard</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item py-2 text-danger" href="{% url 'accounts:logout' %}"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'cart:cart' %}" class="qc-nav-link text-white" title="Cart">
+                            <i class="fa-solid fa-cart-shopping fs-5"></i>
+                            <span class="d-none d-md-inline">Cart</span>
+                        </a>
+                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-light rounded-pill px-4 fw-semibold">Login</a>
+                        <a href="{% url 'accounts:register' %}" class="btn btn-warning rounded-pill px-4 fw-semibold text-dark">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sub-Navbar: Categories Bar -->
+    <nav class="qc-category-bar shadow-sm">
+        <div class="container">
+            <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'products:product_list' %}" class="qc-cat-item active">
+                    <i class="fa-solid fa-grid-2 me-1"></i> All Products
+                </a>
+                {% for cat in nav_categories %}
+                    <a href="{% url 'products:category' cat.slug %}" class="qc-cat-item">
+                        {{ cat.name }}
+                    </a>
+                {% endfor %}
+                <a href="{% url 'coupons:coupons_list' %}" class="qc-cat-item text-danger fw-bold ms-auto">
+                    <i class="fa-solid fa-fire me-1"></i> Special Offers
+                </a>
+                <a href="{% url 'support:faq' %}" class="qc-cat-item text-secondary">
+                    <i class="fa-solid fa-circle-question me-1"></i> FAQ
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages Container -->
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm rounded-3" role="alert">
+                    {% if message.tags == 'danger' or message.tags == 'error' %}
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    {% elif message.tags == 'success' %}
+                        <i class="fa-solid fa-circle-check me-2"></i>
+                    {% else %}
+                        <i class="fa-solid fa-circle-info me-2"></i>
+                    {% endif %}
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="qc-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="qc-brand mb-3">
+                        <i class="fa-solid fa-bolt text-warning"></i> Quick<span>Cart</span>
+                    </div>
+                    <p>QuickCart is your premier destination for online shopping. Experience fast delivery, verified quality, and unbeatable prices every day.</p>
+                    <div class="d-flex gap-3 fs-5 mt-3">
+                        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled d-flex flex-column gap-2">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'products:product_list' %}">All Products</a></li>
+                        <li><a href="{% url 'coupons:coupons_list' %}">Offers & Coupons</a></li>
+                        <li><a href="{% url 'support:faq' %}">FAQs</a></li>
+                        <li><a href="{% url 'support:contact' %}">Contact Support</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5>Customer Care</h5>
+                    <ul class="list-unstyled d-flex flex-column gap-2">
+                        <li><a href="{% url 'accounts:profile' %}">My Account</a></li>
+                        <li><a href="{% url 'orders:my_orders' %}">Order History</a></li>
+                        <li><a href="{% url 'cart:wishlist' %}">Wishlist</a></li>
+                        <li><a href="{% url 'support:tickets' %}">Support Tickets</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5>Contact Us</h5>
+                    <p class="mb-2"><i class="fa-solid fa-location-dot me-2 text-warning"></i> 100 Innovation Parkway, Suite 400, Tech Park</p>
+                    <p class="mb-2"><i class="fa-solid fa-envelope me-2 text-warning"></i> support@quickcart.com</p>
+                    <p class="mb-2"><i class="fa-solid fa-phone me-2 text-warning"></i> +1 (800) 555-QUICK</p>
+                </div>
+            </div>
+            <hr class="my-4 border-secondary">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-center text-md-start">
+                <p class="mb-0">&copy; 2026 QuickCart E-Commerce Inc. All Rights Reserved.</p>
+                <div class="d-flex gap-3 fs-3 text-secondary mt-2 mt-md-0">
+                    <i class="fa-brands fa-cc-visa"></i>
+                    <i class="fa-brands fa-cc-mastercard"></i>
+                    <i class="fa-brands fa-cc-paypal"></i>
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- QuickCart Custom JS -->
+    <script src="{% static 'js/script.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

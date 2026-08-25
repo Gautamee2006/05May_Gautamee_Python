@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - QuickCart{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-dark text-white text-center py-4">
+                    <h3 class="fw-bold mb-1"><i class="fa-solid fa-user-plus text-warning me-2"></i> Create QuickCart Account</h3>
+                    <p class="text-muted mb-0 small">Join millions of happy shoppers today</p>
+                </div>
+                <div class="card-body p-4">
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">First Name</label>
+                                {{ form.first_name }}
+                                {{ form.first_name.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Last Name</label>
+                                {{ form.last_name }}
+                                {{ form.last_name.errors }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Username</label>
+                            {{ form.username }}
+                            {{ form.username.errors }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email Address</label>
+                            {{ form.email }}
+                            {{ form.email.errors }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Mobile Number</label>
+                            {{ form.mobile }}
+                            {{ form.mobile.errors }}
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Password</label>
+                                {{ form.password }}
+                                {{ form.password.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Confirm Password</label>
+                                {{ form.confirm_password }}
+                                {{ form.confirm_password.errors }}
+                            </div>
+                        </div>
+
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-warning btn-lg fw-bold rounded-pill text-dark shadow-sm">
+                                Register & Send OTP <i class="fa-solid fa-paper-plane ms-1"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <p class="text-muted mb-0">Already have an account? <a href="{% url 'accounts:login' %}" class="fw-bold text-primary">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

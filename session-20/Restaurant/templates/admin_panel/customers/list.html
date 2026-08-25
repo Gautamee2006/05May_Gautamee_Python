@@ -1,0 +1,76 @@
+{% extends 'admin_panel/base_admin.html' %}
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="font-display font-bold text-xl text-slate-900 dark:text-white">Customers</h2>
+            <p class="text-xs text-slate-500 mt-0.5">{{ customers|length }} customer(s)</p>
+        </div>
+    </div>
+
+    <form method="get" class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm flex gap-3">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search by name, username or email..." class="flex-grow px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs outline-none focus:ring-2 focus:ring-warm-500 dark:text-slate-100">
+        <select name="status" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs outline-none focus:ring-2 focus:ring-warm-500 dark:text-slate-100">
+            <option value="">All</option>
+            <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+        </select>
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-warm-600 text-white text-xs font-bold hover:bg-warm-700 transition-colors">Search</button>
+    </form>
+
+    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="bg-amber-50/60 dark:bg-slate-700/40 text-left">
+                        <th class="px-5 py-3.5 font-bold text-slate-600 dark:text-slate-300">Customer</th>
+                        <th class="px-5 py-3.5 font-bold text-slate-600 dark:text-slate-300">Email</th>
+                        <th class="px-5 py-3.5 font-bold text-slate-600 dark:text-slate-300">Joined</th>
+                        <th class="px-5 py-3.5 font-bold text-slate-600 dark:text-slate-300">Status</th>
+                        <th class="px-5 py-3.5 font-bold text-slate-600 dark:text-slate-300">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr class="table-row border-t border-slate-100 dark:border-slate-700/60">
+                        <td class="px-5 py-3.5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-warm-400 to-amber-500 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                                    {{ customer.username|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-900 dark:text-white">{{ customer.get_full_name|default:customer.username }}</p>
+                                    <p class="text-[10px] text-slate-400">@{{ customer.username }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-5 py-3.5 text-slate-600 dark:text-slate-300">{{ customer.email }}</td>
+                        <td class="px-5 py-3.5 text-slate-400">{{ customer.date_joined|date:"M d, Y" }}</td>
+                        <td class="px-5 py-3.5">
+                            {% if customer.is_active %}
+                            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 font-bold text-[10px] uppercase">Active</span>
+                            {% else %}
+                            <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 font-bold text-[10px] uppercase">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3.5">
+                            <div class="flex items-center gap-2">
+                                <a href="{% url 'panel_customer_detail' customer.id %}" class="px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-bold text-[10px] hover:bg-blue-100 transition-colors">View</a>
+                                <form action="{% url 'panel_customer_toggle' customer.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="px-3 py-1.5 rounded-lg font-bold text-[10px] transition-colors {% if customer.is_active %}bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 hover:bg-amber-100{% else %}bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100{% endif %}">
+                                        {% if customer.is_active %}Deactivate{% else %}Activate{% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="px-5 py-10 text-center text-slate-400 text-sm">No customers found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

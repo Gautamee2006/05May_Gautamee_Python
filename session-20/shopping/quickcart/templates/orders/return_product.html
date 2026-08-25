@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Return - QuickCart{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 p-4">
+                <h4 class="fw-bold mb-3"><i class="fa-solid fa-rotate-left text-warning me-2"></i> Request Product Return</h4>
+                <p class="text-muted small mb-4">Submitting return request for Order <strong>#{{ order.order_id }}</strong></p>
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Reason for Return</label>
+                        {{ form.reason }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Description / Remarks</label>
+                        {{ form.description }}
+                    </div>
+
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a href="{% url 'orders:order_detail' order.order_id %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                        <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold text-dark shadow-sm">Submit Return Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

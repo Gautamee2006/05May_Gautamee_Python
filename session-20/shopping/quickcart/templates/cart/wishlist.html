@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}My Wishlist - QuickCart{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h3 class="fw-bold mb-4"><i class="fa-solid fa-heart text-danger me-2"></i> My Wishlist</h3>
+
+    {% if wishlist_items %}
+        <div class="row g-3">
+            {% for item in wishlist_items %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 position-relative p-3 text-center">
+                        <a href="{% url 'cart:remove_from_wishlist' item.product.id %}" class="btn-close position-absolute top-0 end-0 m-2" title="Remove from wishlist"></a>
+
+                        <a href="{% url 'products:product_detail' item.product.slug %}">
+                            {% if item.product.main_image %}
+                                <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" class="mx-auto mb-2" style="height: 120px; object-fit: contain;">
+                            {% endif %}
+                        </a>
+
+                        <h6 class="fw-bold text-dark text-truncate mb-1">{{ item.product.name }}</h6>
+                        <div class="text-primary fw-extrabold mb-3">₹{{ item.product.final_price }}</div>
+
+                        <div class="d-grid mt-auto">
+                            <a href="{% url 'cart:move_wishlist_to_cart' item.product.id %}" class="btn btn-warning btn-sm rounded-pill fw-bold text-dark">
+                                <i class="fa-solid fa-cart-arrow-down me-1"></i> Move to Cart
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm text-center p-5 rounded-4">
+            <i class="fa-regular fa-heart display-1 text-muted mb-3"></i>
+            <h4>Your Wishlist is Empty</h4>
+            <p class="text-muted">Save your favorite items to view or purchase them later.</p>
+            <div class="mt-2">
+                <a href="{% url 'products:product_list' %}" class="btn btn-primary rounded-pill px-4">Browse Products</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

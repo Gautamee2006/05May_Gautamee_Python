@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - QuickCart{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h3 class="fw-bold mb-4"><i class="fa-solid fa-box text-success me-2"></i> My Order History</h3>
+
+    <!-- Filter Tabs -->
+    <div class="d-flex gap-2 mb-4 overflow-x-auto pb-2">
+        <a href="{% url 'orders:my_orders' %}" class="btn btn-sm {% if not current_filter %}btn-dark{% else %}btn-outline-dark{% endif %} rounded-pill px-3">All Orders</a>
+        <a href="{% url 'orders:my_orders' %}?status=Placed" class="btn btn-sm {% if current_filter == 'Placed' %}btn-dark{% else %}btn-outline-dark{% endif %} rounded-pill px-3">Placed</a>
+        <a href="{% url 'orders:my_orders' %}?status=Shipped" class="btn btn-sm {% if current_filter == 'Shipped' %}btn-dark{% else %}btn-outline-dark{% endif %} rounded-pill px-3">Shipped</a>
+        <a href="{% url 'orders:my_orders' %}?status=Delivered" class="btn btn-sm {% if current_filter == 'Delivered' %}btn-dark{% else %}btn-outline-dark{% endif %} rounded-pill px-3">Delivered</a>
+        <a href="{% url 'orders:my_orders' %}?status=Cancelled" class="btn btn-sm {% if current_filter == 'Cancelled' %}btn-dark{% else %}btn-outline-dark{% endif %} rounded-pill px-3">Cancelled</a>
+    </div>
+
+    {% if orders %}
+        <div class="d-flex flex-column gap-3">
+            {% for order in orders %}
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap border-bottom pb-3 mb-3 gap-2">
+                        <div>
+                            <span class="text-muted small">ORDER ID:</span>
+                            <span class="fw-bold text-primary ms-1">#{{ order.order_id }}</span>
+                            <span class="text-muted small ms-3"><i class="fa-solid fa-calendar me-1"></i> {{ order.created_at|date:"d M Y, h:i A" }}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge {% if order.order_status == 'Delivered' %}bg-success{% elif order.order_status == 'Cancelled' %}bg-danger{% else %}bg-warning text-dark{% endif %} px-3 py-2 fs-6">
+                                {{ order.order_status }}
+                            </span>
+                            <a href="{% url 'orders:order_detail' order.order_id %}" class="btn btn-sm btn-outline-primary rounded-pill">View Details</a>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex gap-3 overflow-x-auto align-items-center">
+                                {% for item in order.items.all %}
+                                    <div class="d-flex align-items-center gap-2 bg-light p-2 rounded-3 me-2" style="min-width: 200px;">
+                                        {% if item.product and item.product.main_image %}
+                                            <img src="{{ item.product.main_image.url }}" alt="{{ item.product_name }}" style="width: 45px; height: 45px; object-fit: contain;">
+                                        {% endif %}
+                                        <div class="small text-truncate">
+                                            <div class="fw-semibold text-truncate">{{ item.product_name }}</div>
+                                            <div class="text-muted">Qty: {{ item.quantity }} × ₹{{ item.final_price }}</div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <div class="text-muted small">Total Paid</div>
+                            <div class="fs-4 fw-extrabold text-dark">₹{{ order.total_amount }}</div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm text-center p-5 rounded-4">
+            <i class="fa-solid fa-box-open display-1 text-muted mb-3"></i>
+            <h4>No Orders Found</h4>
+            <p class="text-muted">You haven't placed any orders yet.</p>
+            <div class="mt-2">
+                <a href="{% url 'products:product_list' %}" class="btn btn-warning rounded-pill px-4 fw-bold text-dark">Start Shopping</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

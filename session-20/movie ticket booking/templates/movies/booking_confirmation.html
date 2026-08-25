@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking Confirmation - {{ booking.booking_id }}{% endblock %}
+
+{% block content %}
+<div class="container confirmation-container">
+    <div class="confirmation-card">
+        <div class="success-header">
+            <div class="success-icon">🎉</div>
+            <h1 class="success-title">Booking Successful!</h1>
+            <p>Your tickets have been confirmed. Below is your booking summary.</p>
+        </div>
+
+        <div class="ticket-stub">
+            <div class="stub-header">
+                <div class="booking-id-tag">ID: <strong>{{ booking.booking_id }}</strong></div>
+                <div class="booking-status-badge status-{{ booking.status|lower }}">{{ booking.status }}</div>
+            </div>
+
+            <div class="stub-body">
+                <h2 class="stub-movie-title">{{ booking.movie.title }}</h2>
+
+                <div class="stub-grid">
+                    <div class="stub-item">
+                        <span class="label">Date:</span>
+                        <span class="val">{{ booking.show.date|date:"F d, Y" }}</span>
+                    </div>
+                    <div class="stub-item">
+                        <span class="label">Time:</span>
+                        <span class="val">{{ booking.show.time }}</span>
+                    </div>
+                    <div class="stub-item">
+                        <span class="label">Screen:</span>
+                        <span class="val">{{ booking.show.screen_name }}</span>
+                    </div>
+                    <div class="stub-item">
+                        <span class="label">Seats:</span>
+                        <span class="val highlight">{{ booking.selected_seats }}</span>
+                    </div>
+                    <div class="stub-item">
+                        <span class="label">Price per Ticket:</span>
+                        <span class="val">₹{{ booking.show.ticket_price }}</span>
+                    </div>
+                    <div class="stub-item">
+                        <span class="label">Total Paid:</span>
+                        <span class="val total">₹{{ booking.total_amount }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="confirmation-actions">
+            <a href="{% url 'my_bookings' %}" class="btn btn-primary">View My Bookings &rarr;</a>
+            <a href="{% url 'movie_list' %}" class="btn btn-outline-secondary">Browse More Movies</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

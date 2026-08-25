@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - QuickCart{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row g-4">
+        <!-- Sidebar Info -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 text-center p-4 h-100">
+                <div class="position-relative mx-auto mb-3" style="width: 130px; height: 130px;">
+                    {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" alt="{{ user.username }}" class="w-100 h-100 rounded-circle object-fit-cover shadow">
+                    {% else %}
+                        <div class="w-100 h-100 rounded-circle bg-primary text-white d-flex align-items-center justify-content-center display-4 shadow">
+                            {{ user.first_name|first|default:user.username|first|upper }}
+                        </div>
+                    {% endif %}
+                </div>
+                <h4 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h4>
+                <p class="text-muted small mb-3"><i class="fa-solid fa-envelope me-1"></i> {{ user.email }}</p>
+
+                <div class="d-grid gap-2">
+                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-warning fw-bold rounded-pill text-dark">
+                        <i class="fa-solid fa-user-pen me-1"></i> Edit Profile
+                    </a>
+                    <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-dark rounded-pill fw-semibold">
+                        <i class="fa-solid fa-key me-1"></i> Change Password
+                    </a>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="text-start">
+                    <h6 class="fw-bold text-uppercase text-muted small mb-3">Account Overview</h6>
+                    <p class="mb-2"><strong class="text-dark">Mobile:</strong> {{ profile.mobile|default:"Not specified" }}</p>
+                    <p class="mb-2"><strong class="text-dark">Date of Birth:</strong> {{ profile.date_of_birth|default:"Not specified" }}</p>
+                    <p class="mb-2"><strong class="text-dark">Gender:</strong> {{ profile.gender|default:"Not specified" }}</p>
+                    <p class="mb-2"><strong class="text-dark">City/State:</strong> {{ profile.city|default:"" }} {{ profile.state|default:"" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Addresses & Activity -->
+        <div class="col-lg-8">
+            <!-- Saved Addresses -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-location-dot text-danger me-2"></i> Saved Addresses</h5>
+                    <a href="{% url 'accounts:add_address' %}" class="btn btn-sm btn-primary rounded-pill fw-semibold">
+                        <i class="fa-solid fa-plus me-1"></i> Add Address
+                    </a>
+                </div>
+
+                {% if addresses %}
+                    <div class="row g-3">
+                        {% for addr in addresses %}
+                            <div class="col-md-6">
+                                <div class="card border p-3 rounded-3 position-relative {% if addr.is_default %}border-primary bg-light{% endif %}">
+                                    {% if addr.is_default %}
+                                        <span class="badge bg-primary position-absolute top-0 end-0 m-2">Default</span>
+                                    {% endif %}
+                                    <h6 class="fw-bold mb-1">{{ addr.full_name }} <span class="badge bg-secondary ms-1">{{ addr.address_type }}</span></h6>
+                                    <p class="small text-muted mb-1">{{ addr.house_flat }}, {{ addr.street }}, {{ addr.area }}</p>
+                                    <p class="small text-muted mb-2">{{ addr.city }}, {{ addr.state }} - {{ addr.pincode }}</p>
+                                    <p class="small text-dark mb-3"><i class="fa-solid fa-phone me-1"></i> {{ addr.mobile }}</p>
+                                    <div class="d-flex gap-2">
+                                        <a href="{% url 'accounts:edit_address' addr.id %}" class="btn btn-sm btn-outline-secondary py-0">Edit</a>
+                                        <a href="{% url 'accounts:delete_address' addr.id %}" class="btn btn-sm btn-outline-danger py-0" onclick="return confirm('Delete address?')">Delete</a>
+                                        {% if not addr.is_default %}
+                                            <a href="{% url 'accounts:set_default_address' addr.id %}" class="btn btn-sm btn-outline-primary py-0">Set Default</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No saved addresses yet. Click "Add Address" to create one.</p>
+                {% endif %}
+            </div>
+
+            <!-- Recently Viewed -->
+            {% if recently_viewed %}
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <h5 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left text-info me-2"></i> Recently Viewed Items</h5>
+                    <div class="row g-3">
+                        {% for item in recently_viewed %}
+                            <div class="col-6 col-md-3">
+                                <a href="{% url 'products:product_detail' item.product.slug %}" class="text-decoration-none text-dark">
+                                    <div class="card border-0 shadow-sm text-center p-2">
+                                        {% if item.product.main_image %}
+                                            <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" class="mx-auto" style="height: 70px; object-fit: contain;">
+                                        {% endif %}
+                                        <p class="small fw-semibold text-truncate mb-0 mt-1">{{ item.product.name }}</p>
+                                        <span class="small fw-bold text-primary">₹{{ item.product.final_price }}</span>
+                                    </div>
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

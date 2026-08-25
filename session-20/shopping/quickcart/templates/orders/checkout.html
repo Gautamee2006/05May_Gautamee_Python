@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - QuickCart{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h3 class="fw-bold mb-4"><i class="fa-solid fa-credit-card text-success me-2"></i> Checkout & Place Order</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row g-4">
+            
+            <!-- Left Column: Address & Payment Selection -->
+            <div class="col-lg-7">
+                <!-- Address Selection -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-location-dot text-danger me-2"></i> Select Delivery Address</h5>
+                        <a href="{% url 'accounts:add_address' %}?next={% url 'orders:checkout' %}" class="btn btn-sm btn-outline-primary rounded-pill">
+                            <i class="fa-solid fa-plus me-1"></i> Add New Address
+                        </a>
+                    </div>
+
+                    {% if addresses %}
+                        <div class="row g-3">
+                            {% for addr in addresses %}
+                                <div class="col-12">
+                                    <div class="card border p-3 rounded-3 position-relative">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="address_id" id="addr_{{ addr.id }}" value="{{ addr.id }}" {% if addr.is_default or forloop.first %}checked{% endif %} required>
+                                            <label class="form-check-label fw-bold" for="addr_{{ addr.id }}">
+                                                {{ addr.full_name }} <span class="badge bg-secondary ms-1">{{ addr.address_type }}</span>
+                                            </label>
+                                            <p class="small text-muted mb-0 mt-1">{{ addr.house_flat }}, {{ addr.street }}, {{ addr.area }}, {{ addr.city }}, {{ addr.state }} - {{ addr.pincode }}</p>
+                                            <p class="small text-dark mb-0"><i class="fa-solid fa-phone me-1"></i> Phone: {{ addr.mobile }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            No delivery address found. Please <a href="{% url 'accounts:add_address' %}?next={% url 'orders:checkout' %}" class="fw-bold">click here to add an address</a>.
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Payment Method Selection -->
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <h5 class="fw-bold mb-3"><i class="fa-solid fa-wallet text-warning me-2"></i> Payment Options</h5>
+                    
+                    <div class="form-check border p-3 rounded-3 mb-2">
+                        <input class="form-check-input" type="radio" name="payment_method" id="payCOD" value="COD" checked>
+                        <label class="form-check-label fw-bold" for="payCOD">
+                            <i class="fa-solid fa-money-bill-wave text-success me-2"></i> Cash on Delivery (COD)
+                        </label>
+                        <p class="small text-muted mb-0 ms-4">Pay with cash upon receipt of delivery.</p>
+                    </div>
+
+                    <div class="form-check border p-3 rounded-3">
+                        <input class="form-check-input" type="radio" name="payment_method" id="payOnline" value="Online">
+                        <label class="form-check-label fw-bold" for="payOnline">
+                            <i class="fa-solid fa-credit-card text-primary me-2"></i> Online Payment (UPI / Credit Card / Debit Card / NetBanking)
+                        </label>
+                        <p class="small text-muted mb-0 ms-4">Safe & instant online transaction simulator.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Order Summary -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <h5 class="fw-bold border-bottom pb-3 mb-3">Order Summary</h5>
+
+                    <!-- Items Preview List -->
+                    <div class="mb-3 max-h-300 overflow-y-auto">
+                        {% for item in cart_items %}
+                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                <div class="small">
+                                    <span class="fw-bold">{{ item.product.name }}</span> (x{{ item.quantity }})
+                                </div>
+                                <div class="fw-bold text-nowrap">₹{{ item.total_price }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Price Calculations -->
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Subtotal</span>
+                        <span>₹{{ subtotal }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Product Discount</span>
+                        <span class="text-success">- ₹{{ product_discount }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Delivery Charges</span>
+                        <span class="fw-semibold">
+                            {% if delivery_charge == 0 %}
+                                <span class="text-success">FREE</span>
+                            {% else %}
+                                ₹{{ delivery_charge }}
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    {% if coupon_discount > 0 %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Coupon Discount</span>
+                            <span class="text-success">- ₹{{ coupon_discount }}</span>
+                        </div>
+                    {% endif %}
+
+                    <hr class="my-3">
+
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="fw-bold fs-5">Total Payable Amount</span>
+                        <span class="fw-extrabold fs-4 text-primary">₹{{ final_total }}</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg rounded-pill fw-bold w-100 shadow-sm" {% if not addresses %}disabled{% endif %}>
+                        <i class="fa-solid fa-lock me-2"></i> Confirm Order & Pay
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+{% endblock %}

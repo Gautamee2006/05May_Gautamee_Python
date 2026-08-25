@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Coupons & Special Offers - QuickCart{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="fa-solid fa-ticket text-warning me-2"></i> QuickCart Special Offers & Coupons</h3>
+                <p class="mb-0 text-white-50">Copy any coupon code below and apply it during checkout to save extra money!</p>
+            </div>
+            <i class="fa-solid fa-gift display-2 text-warning opacity-50 d-none d-md-block"></i>
+        </div>
+    </div>
+
+    {% if coupons %}
+        <div class="row g-3">
+            {% for coupon in coupons %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 position-relative border-start border-4 border-warning">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-warning text-dark font-monospace fs-6 px-3 py-1 fw-bold">{{ coupon.code }}</span>
+                            <span class="small text-danger fw-semibold">Expires: {{ coupon.expiry_date|date:"d M Y" }}</span>
+                        </div>
+                        <h5 class="fw-bold mb-1">
+                            {% if coupon.discount_type == 'percentage' %}
+                                {{ coupon.discount_value|stringformat:".0f" }}% OFF
+                            {% else %}
+                                Flat ₹{{ coupon.discount_value }} OFF
+                            {% endif %}
+                        </h5>
+                        <p class="small text-muted mb-3">On minimum order of ₹{{ coupon.min_order_amount }}</p>
+                        
+                        <div class="d-grid">
+                            <button class="btn btn-outline-dark btn-sm rounded-pill font-monospace" onclick="navigator.clipboard.writeText('{{ coupon.code }}'); alert('Copied coupon code {{ coupon.code }} to clipboard!');">
+                                Copy Code
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm text-center p-5 rounded-4">
+            <i class="fa-solid fa-ticket-simple display-1 text-muted mb-3"></i>
+            <h4>No Active Coupons Available</h4>
+            <p class="text-muted">Check back soon for exciting discount coupons!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

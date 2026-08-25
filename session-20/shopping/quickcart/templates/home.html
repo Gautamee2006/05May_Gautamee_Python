@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}QuickCart - India's Favorite E-Commerce Store{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+
+    <!-- Hero Banner -->
+    <div class="qc-hero-banner text-center text-lg-start">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill font-monospace mb-3">MEGA ELECTRONICS & FASHION SALE</span>
+                <h1 class="display-4 fw-extrabold mb-3">Upgrade Your Lifestyle With Up To <span class="text-warning">60% OFF</span></h1>
+                <p class="lead mb-4 opacity-90">Explore top brands in tech, fashion, kitchen, and home essentials with free shipping & lightning-fast delivery.</p>
+                <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                    <a href="{% url 'products:product_list' %}" class="btn btn-warning btn-lg rounded-pill px-5 fw-bold text-dark shadow-sm">Shop Now <i class="fa-solid fa-arrow-right ms-2"></i></a>
+                    <a href="{% url 'coupons:coupons_list' %}" class="btn btn-outline-light btn-lg rounded-pill px-4 fw-semibold">View Coupons</a>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center mt-4 mt-lg-0">
+                <i class="fa-solid fa-bag-shopping display-1 text-warning opacity-75"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories Section -->
+    <div class="mb-5">
+        <div class="qc-section-title">
+            <span><i class="fa-solid fa-layer-group text-primary me-2"></i> Shop by Category</span>
+            <a href="{% url 'products:product_list' %}" class="btn btn-sm btn-outline-secondary rounded-pill">View All</a>
+        </div>
+        <div class="row g-3">
+            {% for cat in categories %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <a href="{% url 'products:category' cat.slug %}" class="card border-0 shadow-sm text-center p-3 h-100 text-decoration-none qc-card">
+                        {% if cat.image %}
+                            <img src="{{ cat.image.url }}" alt="{{ cat.name }}" class="mx-auto mb-2" style="max-height: 80px; object-fit: contain;">
+                        {% else %}
+                            <div class="bg-light rounded-circle p-3 mx-auto mb-2" style="width: 70px; height: 70px;">
+                                <i class="fa-solid fa-box-open fs-2 text-primary"></i>
+                            </div>
+                        {% endif %}
+                        <h6 class="fw-bold text-dark mb-0">{{ cat.name }}</h6>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Special Discount Offers -->
+    {% if discount_offers %}
+        <div class="mb-5">
+            <div class="qc-section-title">
+                <span><i class="fa-solid fa-fire text-danger me-2"></i> Hot Deals & Discount Offers</span>
+            </div>
+            <div class="row g-3">
+                {% for product in discount_offers %}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        {% include 'products/includes/product_card.html' %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Featured Products -->
+    {% if featured_products %}
+        <div class="mb-5">
+            <div class="qc-section-title">
+                <span><i class="fa-solid fa-star text-warning me-2"></i> Featured Top Picks</span>
+            </div>
+            <div class="row g-3">
+                {% for product in featured_products %}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        {% include 'products/includes/product_card.html' %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Best Sellers -->
+    {% if best_sellers %}
+        <div class="mb-5">
+            <div class="qc-section-title">
+                <span><i class="fa-solid fa-crown text-primary me-2"></i> Best Sellers</span>
+            </div>
+            <div class="row g-3">
+                {% for product in best_sellers %}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        {% include 'products/includes/product_card.html' %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Recommended Products -->
+    {% if recommended_products %}
+        <div class="mb-5">
+            <div class="qc-section-title">
+                <span><i class="fa-solid fa-thumbs-up text-success me-2"></i> Recommended For You</span>
+            </div>
+            <div class="row g-3">
+                {% for product in recommended_products %}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        {% include 'products/includes/product_card.html' %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Recently Viewed Products -->
+    {% if recently_viewed_products %}
+        <div class="mb-5">
+            <div class="qc-section-title">
+                <span><i class="fa-solid fa-clock-rotate-left text-info me-2"></i> Recently Viewed</span>
+            </div>
+            <div class="row g-3">
+                {% for product in recently_viewed_products %}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        {% include 'products/includes/product_card.html' %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

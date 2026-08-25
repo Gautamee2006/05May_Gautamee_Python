@@ -1,0 +1,35 @@
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div style="margin-bottom: 25px;">
+    <h2 style="margin-bottom: 15px; color: #1e293b; font-family: inherit;">📊 System Overview Dashboard</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px;">
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="font-size: 26px; font-weight: bold; color: #1d4ed8;">{{ total_users }}</div>
+            <div style="color: #3b82f6; font-size: 13px; font-weight: 600; text-transform: uppercase; margin-top: 5px;">Total Users</div>
+        </div>
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="font-size: 26px; font-weight: bold; color: #15803d;">{{ total_movies }}</div>
+            <div style="color: #22c55e; font-size: 13px; font-weight: 600; text-transform: uppercase; margin-top: 5px;">Total Movies</div>
+        </div>
+        <div style="background: #fefce8; border: 1px solid #fef08a; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="font-size: 26px; font-weight: bold; color: #a16207;">{{ total_shows }}</div>
+            <div style="color: #eab308; font-size: 13px; font-weight: 600; text-transform: uppercase; margin-top: 5px;">Total Shows</div>
+        </div>
+        <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="font-size: 26px; font-weight: bold; color: #7e22ce;">{{ total_bookings }}</div>
+            <div style="color: #a855f7; font-size: 13px; font-weight: 600; text-transform: uppercase; margin-top: 5px;">Total Bookings</div>
+        </div>
+        <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="font-size: 26px; font-weight: bold; color: #047857;">{{ confirmed_bookings }}</div>
+            <div style="color: #10b981; font-size: 13px; font-weight: 600; text-transform: uppercase; margin-top: 5px;">Confirmed</div>
+        </div>
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="font-size: 26px; font-weight: bold; color: #b91c1c;">{{ cancelled_bookings }}</div>
+            <div style="color: #ef4444; font-size: 13px; font-weight: 600; text-transform: uppercase; margin-top: 5px;">Cancelled</div>
+        </div>
+    </div>
+</div>
+{{ block.super }}
+{% endblock %}

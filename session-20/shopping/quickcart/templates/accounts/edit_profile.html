@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - QuickCart{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 p-4">
+                <h3 class="fw-bold mb-4"><i class="fa-solid fa-user-pen text-warning me-2"></i> Edit Account Profile</h3>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <h6 class="fw-bold text-uppercase text-muted border-bottom pb-2 mb-3">Basic Information</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">First Name</label>
+                            {{ u_form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Last Name</label>
+                            {{ u_form.last_name }}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email Address</label>
+                            {{ u_form.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Mobile Number</label>
+                            {{ p_form.mobile }}
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-uppercase text-muted border-bottom pb-2 mb-3">Personal Details</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Date of Birth</label>
+                            {{ p_form.date_of_birth }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Gender</label>
+                            {{ p_form.gender }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Profile Picture</label>
+                            {{ p_form.profile_picture }}
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-uppercase text-muted border-bottom pb-2 mb-3">Primary Location</h6>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Street Address</label>
+                        {{ p_form.address }}
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">City</label>
+                            {{ p_form.city }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">State</label>
+                            {{ p_form.state }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Pincode</label>
+                            {{ p_form.pincode }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                        <button type="submit" class="btn btn-warning rounded-pill px-5 fw-bold text-dark shadow-sm">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

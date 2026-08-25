@@ -1,0 +1,104 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Header + Add Button -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h2 class="font-display font-bold text-xl text-slate-900 dark:text-white">All Restaurants</h2>
+            <p class="text-xs text-slate-500 mt-0.5">{{ restaurants|length }} restaurant(s) found</p>
+        </div>
+        <a href="{% url 'panel_restaurant_add' %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-warm-600 hover:bg-warm-700 text-white font-bold text-xs shadow-md transition-colors">
+            <i class="fa-solid fa-plus"></i> Add Restaurant
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <form method="get" class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search by name..." class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+        <select name="cuisine" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+            <option value="">All Cuisines</option>
+            {% for c in cuisines %}<option value="{{ c.name }}" {% if cuisine_filter == c.name %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+        </select>
+        <select name="location" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+            <option value="">All Locations</option>
+            {% for l in locations %}<option value="{{ l.name }}" {% if location_filter == l.name %}selected{% endif %}>{{ l.name }}</option>{% endfor %}
+        </select>
+        <div class="flex gap-2">
+            <select name="status" class="flex-grow px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-warm-500">
+                <option value="">All Status</option>
+                <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+            </select>
+            <button type="submit" class="px-4 py-2.5 rounded-xl bg-warm-600 text-white text-xs font-bold hover:bg-warm-700 transition-colors">Filter</button>
+        </div>
+    </form>
+
+    <!-- Table -->
+    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="bg-amber-50/60 dark:bg-slate-700/40 text-left">
+                        <th class="px-5 py-3.5 font-bold text-slate-600 dark:text-slate-300">Restaurant</th>
+                        <th class="px-5 py-3.5 font-bold text-slate-600 dark:text-slate-300">Cuisine</th>
+                        <th class="px-5 py-3.5 font-bold text-slate-600 dark:text-slate-300">Location</th>
+                        <th class="px-5 py-3.5 font-bold text-slate-600 dark:text-slate-300">Rating</th>
+                        <th class="px-5 py-3.5 font-bold text-slate-600 dark:text-slate-300">Price</th>
+                        <th class="px-5 py-3.5 font-bold text-slate-600 dark:text-slate-300">Hours</th>
+                        <th class="px-5 py-3.5 font-bold text-slate-600 dark:text-slate-300">Status</th>
+                        <th class="px-5 py-3.5 font-bold text-slate-600 dark:text-slate-300">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rest in restaurants %}
+                    <tr class="table-row border-t border-slate-100 dark:border-slate-700/60">
+                        <td class="px-5 py-3.5">
+                            <div class="flex items-center gap-3">
+                                <img src="{{ rest.image }}" alt="{{ rest.name }}" class="w-10 h-10 rounded-xl object-cover flex-shrink-0">
+                                <div>
+                                    <p class="font-bold text-slate-900 dark:text-white">{{ rest.name }}</p>
+                                    <p class="text-[10px] text-slate-400">{{ rest.phone }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-5 py-3.5 text-slate-600 dark:text-slate-300">{{ rest.cuisine.name }}</td>
+                        <td class="px-5 py-3.5 text-slate-600 dark:text-slate-300">{{ rest.location.name }}</td>
+                        <td class="px-5 py-3.5">
+                            <span class="font-bold text-amber-600 dark:text-amber-400"><i class="fa-solid fa-star text-[10px] mr-0.5"></i>{{ rest.rating }}</span>
+                        </td>
+                        <td class="px-5 py-3.5 font-bold text-slate-700 dark:text-slate-200">{{ rest.price_range }}</td>
+                        <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400">{{ rest.opening_time|time:"h:i A" }} – {{ rest.closing_time|time:"h:i A" }}</td>
+                        <td class="px-5 py-3.5">
+                            {% if rest.is_active %}
+                            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 font-bold text-[10px] uppercase">Active</span>
+                            {% else %}
+                            <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 font-bold text-[10px] uppercase">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3.5">
+                            <div class="flex items-center gap-2">
+                                <a href="{% url 'panel_restaurant_edit' rest.id %}" class="px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-bold text-[10px] hover:bg-blue-100 transition-colors">Edit</a>
+                                <form action="{% url 'panel_restaurant_toggle' rest.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="px-3 py-1.5 rounded-lg font-bold text-[10px] transition-colors {% if rest.is_active %}bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 hover:bg-amber-100{% else %}bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100{% endif %}">
+                                        {% if rest.is_active %}Deactivate{% else %}Activate{% endif %}
+                                    </button>
+                                </form>
+                                <form action="{% url 'panel_restaurant_delete' rest.id %}" method="post" onsubmit="return confirm('Delete {{ rest.name }}? This cannot be undone.')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold text-[10px] hover:bg-rose-100 transition-colors">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" class="px-5 py-10 text-center text-slate-400 text-sm">No restaurants found. <a href="{% url 'panel_restaurant_add' %}" class="text-warm-500 underline">Add one now</a>.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

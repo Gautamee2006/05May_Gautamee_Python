@@ -1,0 +1,80 @@
+{% extends 'admin_panel/base_admin.html' %}
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="font-display font-bold text-xl text-slate-900 dark:text-white">Offers & Coupons</h2>
+            <p class="text-xs text-slate-500 mt-0.5">{{ offers|length }} offer(s)</p>
+        </div>
+        <a href="{% url 'panel_offer_add' %}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-warm-600 hover:bg-warm-700 text-white font-bold text-xs shadow-md transition-colors">
+            <i class="fa-solid fa-plus"></i> Add Offer
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <form method="get" class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm flex flex-wrap gap-3">
+        <select name="restaurant" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs outline-none focus:ring-2 focus:ring-warm-500 dark:text-slate-100">
+            <option value="">All Restaurants</option>
+            {% for rest in restaurants %}<option value="{{ rest.id }}" {% if restaurant_filter == rest.id|stringformat:"s" %}selected{% endif %}>{{ rest.name }}</option>{% endfor %}
+        </select>
+        <select name="status" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 dark:bg-slate-900 text-xs outline-none focus:ring-2 focus:ring-warm-500 dark:text-slate-100">
+            <option value="">All Status</option>
+            <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+            <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>Expired</option>
+        </select>
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-warm-600 text-white text-xs font-bold hover:bg-warm-700 transition-colors">Filter</button>
+    </form>
+
+    <!-- Offers Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {% for offer in offers %}
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-amber-100 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-r from-warm-500/10 via-amber-500/10 to-transparent dark:from-warm-950/40 dark:via-amber-950/30 p-5 border-b border-amber-100 dark:border-slate-700">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="px-3 py-1 rounded-full bg-warm-600 text-white text-xs font-bold">{{ offer.discount_percentage }}% OFF</span>
+                    {% if offer.is_active and offer.end_date >= today %}
+                    <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 font-bold text-[10px]">Active</span>
+                    {% elif not offer.is_active %}
+                    <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400 font-bold text-[10px]">Inactive</span>
+                    {% else %}
+                    <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400 font-bold text-[10px]">Expired</span>
+                    {% endif %}
+                </div>
+                <h4 class="font-display font-bold text-base text-slate-900 dark:text-white">{{ offer.title }}</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{{ offer.description }}</p>
+            </div>
+            <div class="p-5 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="font-mono font-bold text-sm px-3 py-1.5 rounded-xl border border-dashed border-warm-400 bg-amber-50 dark:bg-slate-900 text-warm-600 dark:text-warm-400">
+                        {{ offer.coupon_code }}
+                    </span>
+                    <div class="text-xs text-slate-400">
+                        <p>{{ offer.start_date|date:"M d" }} – {{ offer.end_date|date:"M d, Y" }}</p>
+                        {% if offer.restaurant %}<p class="text-[10px]">{{ offer.restaurant.name }}</p>{% else %}<p class="text-[10px]">Site-wide</p>{% endif %}
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
+                    <a href="{% url 'panel_offer_edit' offer.id %}" class="px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-bold text-[10px] hover:bg-blue-100 transition-colors">Edit</a>
+                    <form action="{% url 'panel_offer_toggle' offer.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="px-3 py-1.5 rounded-lg font-bold text-[10px] transition-colors {% if offer.is_active %}bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 hover:bg-amber-100{% else %}bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100{% endif %}">
+                            {% if offer.is_active %}Deactivate{% else %}Activate{% endif %}
+                        </button>
+                    </form>
+                    <form action="{% url 'panel_offer_delete' offer.id %}" method="post" onsubmit="return confirm('Delete offer {{ offer.title }}?')">
+                        {% csrf_token %}
+                        <button type="submit" class="px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold text-[10px] hover:bg-rose-100 transition-colors">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-3 py-20 text-center">
+            <i class="fa-solid fa-tags text-4xl text-slate-200 dark:text-slate-700 mb-3"></i>
+            <p class="text-sm text-slate-400">No offers found. <a href="{% url 'panel_offer_add' %}" class="text-warm-500 underline">Add one now</a>.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

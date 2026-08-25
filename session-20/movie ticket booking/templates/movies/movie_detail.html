@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ movie.title }} - Details & Showtimes{% endblock %}
+
+{% block content %}
+<div class="container movie-detail-container">
+    <a href="{% url 'movie_list' %}" class="back-link">&larr; Back to Movies</a>
+
+    <div class="movie-detail-hero">
+        <div class="hero-poster">
+            <img src="{{ movie.poster }}" alt="{{ movie.title }}" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80'">
+        </div>
+
+        <div class="hero-info">
+            <div class="movie-header-tags">
+                <span class="tag genre-tag">{{ movie.genre }}</span>
+                <span class="tag lang-tag">{{ movie.language }}</span>
+                <span class="tag rating-tag">⭐ {{ movie.rating|floatformat:1 }} / 5.0</span>
+            </div>
+
+            <h1 class="movie-hero-title">{{ movie.title }}</h1>
+            <p class="movie-meta-row">
+                <span>⏱️ {{ movie.duration }} Minutes</span> • 
+                <span>🗓️ Released: {{ movie.release_date|date:"F d, Y" }}</span>
+            </p>
+
+            <div class="movie-description">
+                <h3>About the Movie</h3>
+                <p>{{ movie.description }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Show Timings Section -->
+    <div class="shows-section">
+        <h2 class="section-title">🍿 Available Show Timings</h2>
+
+        {% if shows %}
+            <div class="shows-grid">
+                {% for show in shows %}
+                    <div class="show-card">
+                        <div class="show-time-badge">
+                            <span class="show-time">{{ show.time|date:"i:s A" }}</span>
+                            <span class="show-date">{{ show.date|date:"D, M d" }}</span>
+                        </div>
+                        
+                        <div class="show-details">
+                            <span class="screen-name">📺 {{ show.screen_name }}</span>
+                            <span class="ticket-price">₹{{ show.ticket_price }} / ticket</span>
+                        </div>
+
+                        <a href="{% url 'seat_selection' show.id %}" class="btn btn-primary btn-sm">Book Ticket &rarr;</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-shows-card">
+                <p>No show timings currently scheduled for this movie. Check back soon!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

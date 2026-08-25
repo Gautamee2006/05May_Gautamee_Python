@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Products - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h3 class="fw-bold mb-0"><i class="fa-solid fa-box text-primary me-2"></i> Product Management</h3>
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary rounded-pill btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                <i class="fa-solid fa-plus me-1"></i> Add Product
+            </button>
+            <button class="btn btn-outline-dark rounded-pill btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                <i class="fa-solid fa-folder-plus me-1"></i> Add Category
+            </button>
+        </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="qc-dashboard-card">
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Discount</th>
+                        <th>Final Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prod in products %}
+                        <tr>
+                            <td>
+                                {% if prod.main_image %}
+                                    <img src="{{ prod.main_image.url }}" alt="{{ prod.name }}" style="width: 40px; height: 40px; object-fit: contain;" class="rounded-2 bg-light">
+                                {% endif %}
+                            </td>
+                            <td class="fw-semibold">{{ prod.name }}</td>
+                            <td><span class="badge bg-secondary">{{ prod.category.name }}</span></td>
+                            <td>₹{{ prod.price }}</td>
+                            <td>{{ prod.discount_percentage }}%</td>
+                            <td class="fw-bold text-success">₹{{ prod.final_price }}</td>
+                            <td>
+                                {% if prod.stock <= 5 %}
+                                    <span class="badge bg-danger">{{ prod.stock }} (Low)</span>
+                                {% else %}
+                                    <span class="badge bg-success">{{ prod.stock }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if prod.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'dashboard:edit_product' prod.id %}" class="btn btn-sm btn-outline-primary me-1"><i class="fa-solid fa-pen"></i> Edit</a>
+                                <a href="{% url 'dashboard:delete_product' prod.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete product?')"><i class="fa-solid fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-header-title fw-bold mb-0">Add New Product</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_product">
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label fw-bold">Name</label>{{ product_form.name }}</div>
+                        <div class="col-md-6"><label class="form-label fw-bold">Category</label>{{ product_form.category }}</div>
+                        <div class="col-md-6"><label class="form-label fw-bold">Brand</label>{{ product_form.brand }}</div>
+                        <div class="col-md-6"><label class="form-label fw-bold">SKU</label>{{ product_form.sku }}</div>
+                        <div class="col-md-4"><label class="form-label fw-bold">Price (₹)</label>{{ product_form.price }}</div>
+                        <div class="col-md-4"><label class="form-label fw-bold">Discount (%)</label>{{ product_form.discount_percentage }}</div>
+                        <div class="col-md-4"><label class="form-label fw-bold">Stock</label>{{ product_form.stock }}</div>
+                        <div class="col-12"><label class="form-label fw-bold">Description</label>{{ product_form.description }}</div>
+                        <div class="col-md-6"><label class="form-label fw-bold">Main Image</label>{{ product_form.main_image }}</div>
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="form-check mt-3">
+                                {{ product_form.is_active }}
+                                <label class="form-check-label fw-bold">Is Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary fw-bold rounded-pill px-4">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-header-title fw-bold mb-0">Add New Category</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_category">
+                <div class="modal-body p-4">
+                    <div class="mb-3"><label class="form-label fw-bold">Name</label>{{ category_form.name }}</div>
+                    <div class="mb-3"><label class="form-label fw-bold">Description</label>{{ category_form.description }}</div>
+                    <div class="mb-3"><label class="form-label fw-bold">Image</label>{{ category_form.image }}</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-dark fw-bold rounded-pill px-4">Save Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
