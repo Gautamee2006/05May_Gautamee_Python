@@ -1,0 +1,188 @@
+{% extends 'bookings/base.html' %}
+{% load static %}
+
+{% block title %}My Bookings - CabGo{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h2 class="fw-bold text-white mb-1">
+                <i class="fa-solid fa-clock-rotate-left text-warning me-2"></i> My Booking History
+            </h2>
+            <p class="text-muted small mb-0">Track, view details, or cancel your cab reservations.</p>
+        </div>
+        <div>
+            <a href="{% url 'book_cab' %}" class="btn btn-cabgo-primary">
+                <i class="fa-solid fa-plus me-1"></i> Book New Cab
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Pills -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a href="{% url 'booking_history' %}?status=all" class="btn btn-sm {% if current_status == 'all' or not current_status %}btn-warning fw-bold{% else %}btn-outline-secondary text-light{% endif %} rounded-pill px-4 py-2">
+            All Rides
+        </a>
+        <a href="{% url 'booking_history' %}?status=Confirmed" class="btn btn-sm {% if current_status == 'Confirmed' %}btn-success fw-bold{% else %}btn-outline-secondary text-light{% endif %} rounded-pill px-4 py-2">
+            Confirmed
+        </a>
+        <a href="{% url 'booking_history' %}?status=Completed" class="btn btn-sm {% if current_status == 'Completed' %}btn-info fw-bold{% else %}btn-outline-secondary text-light{% endif %} rounded-pill px-4 py-2">
+            Completed
+        </a>
+        <a href="{% url 'booking_history' %}?status=Cancelled" class="btn btn-sm {% if current_status == 'Cancelled' %}btn-danger fw-bold{% else %}btn-outline-secondary text-light{% endif %} rounded-pill px-4 py-2">
+            Cancelled
+        </a>
+    </div>
+
+    <!-- Bookings Container -->
+    {% if bookings %}
+    <div class="row g-4">
+        {% for b in bookings %}
+        <div class="col-lg-6" id="booking-card-{{ b.booking_id }}">
+            <div class="glass-panel p-4 h-100 position-relative">
+                
+                <!-- Card Top Header -->
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom border-secondary">
+                    <div>
+                        <span class="fw-bold text-warning fs-5 me-2"><i class="fa-solid fa-ticket me-1"></i>{{ b.booking_id }}</span>
+                        <span class="text-muted small">{{ b.created_at|date:"d M Y, h:i A" }}</span>
+                    </div>
+                    <div>
+                        {% if b.booking_status == 'Confirmed' %}
+                            <span class="badge badge-confirmed">{{ b.booking_status }}</span>
+                        {% elif b.booking_status == 'Completed' %}
+                            <span class="badge badge-completed">{{ b.booking_status }}</span>
+                        {% elif b.booking_status == 'Cancelled' %}
+                            <span class="badge badge-cancelled">{{ b.booking_status }}</span>
+                        {% else %}
+                            <span class="badge badge-pending">{{ b.booking_status }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Locations -->
+                <div class="mb-3">
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <i class="fa-solid fa-circle-dot text-success mt-1"></i>
+                        <div>
+                            <div class="text-muted small">Pickup</div>
+                            <div class="text-light fw-semibold">{{ b.pickup_address }}</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="fa-solid fa-flag-checkered text-danger mt-1"></i>
+                        <div>
+                            <div class="text-muted small">Drop Destination</div>
+                            <div class="text-light fw-semibold">{{ b.drop_address }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics Grid -->
+                <div class="row g-2 fare-box text-center mb-3">
+                    <div class="col-3">
+                        <div class="text-muted small">Cab</div>
+                        <div class="fw-bold text-warning small">{{ b.cab_type }}</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="text-muted small">Distance</div>
+                        <div class="fw-bold text-light small">{{ b.distance_km }} km</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="text-muted small">Time</div>
+                        <div class="fw-bold text-light small">{{ b.estimated_time }}</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="text-muted small">Fare</div>
+                        <div class="fw-bold text-success small">₹{{ b.fare }}</div>
+                    </div>
+                </div>
+
+                <!-- Driver Info & Actions -->
+                <div class="d-flex justify-content-between align-items-center pt-2">
+                    <div class="text-muted small">
+                        <i class="fa-solid fa-user me-1 text-warning"></i> {{ b.driver_name }} ({{ b.driver_vehicle }})
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'booking_confirmation' b.booking_id %}" class="btn btn-sm btn-cabgo-outline">
+                            <i class="fa-solid fa-eye me-1"></i> Receipt
+                        </a>
+                        {% if b.is_cancellable %}
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmCancelBooking('{{ b.booking_id }}')">
+                            <i class="fa-solid fa-ban me-1"></i> Cancel
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="glass-panel p-5 text-center my-4">
+        <div class="display-3 text-muted mb-3"><i class="fa-solid fa-car-side"></i></div>
+        <h4 class="fw-bold text-white mb-2">No Bookings Found</h4>
+        <p class="text-muted mb-4">You haven't booked any rides matching this status yet.</p>
+        <a href="{% url 'book_cab' %}" class="btn btn-cabgo-primary">
+            <i class="fa-solid fa-taxi me-2"></i> Book Your First Cab
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Cancel Confirmation Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-panel text-white border-danger">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title fw-bold text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i> Cancel Ride</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel booking <strong class="text-warning" id="modalBookingId"></strong>?</p>
+                <p class="text-muted small mb-0">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-outline-secondary text-light" data-bs-dismiss="modal">Keep Booking</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmCancel">Confirm Cancellation</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let activeCancelBookingId = null;
+
+    function confirmCancelBooking(bookingId) {
+        activeCancelBookingId = bookingId;
+        document.getElementById('modalBookingId').innerText = bookingId;
+        const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+        modal.show();
+    }
+
+    document.getElementById('btnConfirmCancel').addEventListener('click', function() {
+        if (!activeCancelBookingId) return;
+        
+        fetch(`/api/bookings/${activeCancelBookingId}/cancel/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.error || 'Failed to cancel booking.');
+            }
+        })
+        .catch(err => {
+            alert('Error connecting to server.');
+        });
+    });
+</script>
+{% endblock %}

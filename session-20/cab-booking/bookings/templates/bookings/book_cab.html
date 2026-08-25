@@ -1,0 +1,195 @@
+{% extends 'bookings/base.html' %}
+{% load static %}
+
+{% block title %}Book a Cab - CabGo{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <div class="row g-4">
+        <!-- LEFT COLUMN: Google Map & Live Tracking -->
+        <div class="col-lg-7 col-xl-7">
+            <div class="glass-panel p-3 h-100 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-3 px-2">
+                    <h5 class="fw-bold text-white mb-0">
+                        <i class="fa-solid fa-map-location-dot text-warning me-2"></i> Interactive Map & Route
+                    </h5>
+                    <span class="badge bg-dark border border-secondary text-light px-3 py-2" id="mapStatusBadge">
+                        <i class="fa-solid fa-signal me-1 text-success"></i> Map Ready
+                    </span>
+                </div>
+                
+                <!-- Map Canvas Container -->
+                <div class="flex-grow-1 position-relative" style="min-height: 520px;">
+                    <div id="map"></div>
+                    
+                    <!-- Floating Map Action Pills -->
+                    <div class="position-absolute bottom-0 start-0 m-3 z-3 d-flex gap-2">
+                        <button type="button" class="btn btn-dark btn-sm border border-secondary shadow-sm text-light" id="btnRecenterMap" title="Center on Pickup">
+                            <i class="fa-solid fa-arrows-to-dot text-warning me-1"></i> Center Map
+                        </button>
+                        <button type="button" class="btn btn-dark btn-sm border border-secondary shadow-sm text-light" id="btnTogglePins" title="Toggle Pin Mode">
+                            <i class="fa-solid fa-hand-pointer text-info me-1"></i> <span id="pinModeText">Click Map to Pick Locations</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Route Summary Bar -->
+                <div class="row g-3 mt-3 text-center" id="routeMetricsBar">
+                    <div class="col-6 col-md-4">
+                        <div class="fare-box">
+                            <div class="text-muted small">Distance</div>
+                            <div class="fs-4 fw-bold text-warning" id="metricDistance">0.0 km</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="fare-box">
+                            <div class="text-muted small">Est. Time</div>
+                            <div class="fs-4 fw-bold text-white" id="metricTime">0 min</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="fare-box">
+                            <div class="text-muted small">Est. Fare</div>
+                            <div class="fs-4 fw-bold text-success" id="metricFare">₹0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Booking Form & Controls -->
+        <div class="col-lg-5 col-xl-5">
+            <div class="glass-panel p-4">
+                <h4 class="fw-bold text-white mb-4">
+                    <i class="fa-solid fa-route text-warning me-2"></i> Ride Details
+                </h4>
+
+                <form id="cabBookingForm" onsubmit="return false;">
+                    {% csrf_token %}
+                    
+                    <!-- Hidden inputs for coordinates & calculated stats -->
+                    <input type="hidden" id="pickup_lat" name="pickup_lat">
+                    <input type="hidden" id="pickup_lng" name="pickup_lng">
+                    <input type="hidden" id="drop_lat" name="drop_lat">
+                    <input type="hidden" id="drop_lng" name="drop_lng">
+                    <input type="hidden" id="distance_km" name="distance_km" value="0">
+                    <input type="hidden" id="estimated_time" name="estimated_time" value="0 min">
+                    <input type="hidden" id="selected_cab" name="selected_cab" value="Sedan">
+
+                    <!-- 1. Pickup Location Section -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label text-light fw-semibold mb-0">
+                                <i class="fa-solid fa-circle-dot text-success me-2"></i> Pickup Location
+                            </label>
+                            <button type="button" class="btn btn-use-location" id="btnUseMyLocation">
+                                <i class="fa-solid fa-location-crosshairs me-1"></i> Use My Location
+                            </button>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-success"><i class="fa-solid fa-location-dot"></i></span>
+                            <input type="text" class="form-control" id="pickupAddressInput" placeholder="Enter pickup location or click on map..." autocomplete="off" required>
+                        </div>
+                        <div class="form-text text-muted small mt-1" id="pickupAddressDisplay">
+                            📍 Selected: <span class="text-light" id="lblPickupAddress">None</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. Drop Location Section -->
+                    <div class="mb-4">
+                        <label class="form-label text-light fw-semibold mb-2">
+                            <i class="fa-solid fa-location-dot text-danger me-2"></i> Where are you going?
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-danger"><i class="fa-solid fa-flag-checkered"></i></span>
+                            <input type="text" class="form-control" id="dropAddressInput" placeholder="Search destination or click map..." autocomplete="off" required>
+                        </div>
+                        <div class="form-text text-muted small mt-1" id="dropAddressDisplay">
+                            🚩 Selected: <span class="text-light" id="lblDropAddress">None</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Cab Category Selection -->
+                    <div class="mb-4">
+                        <label class="form-label text-light fw-semibold mb-2">
+                            <i class="fa-solid fa-car text-warning me-2"></i> Select Cab Type
+                        </label>
+                        <div class="row g-2">
+                            <!-- Mini Card -->
+                            <div class="col-4">
+                                <div class="cab-card text-center" data-cab="Mini" data-rate="10" onclick="selectCabType('Mini', 10, this)">
+                                    <span class="cab-badge mb-1 d-inline-block"><i class="fa-solid fa-user me-1"></i>3</span>
+                                    <div class="fw-bold text-white small">Mini</div>
+                                    <div class="text-warning fw-bold small">₹10/km</div>
+                                </div>
+                            </div>
+                            <!-- Sedan Card (Default) -->
+                            <div class="col-4">
+                                <div class="cab-card active text-center" data-cab="Sedan" data-rate="15" onclick="selectCabType('Sedan', 15, this)">
+                                    <span class="cab-badge mb-1 d-inline-block"><i class="fa-solid fa-user me-1"></i>4</span>
+                                    <div class="fw-bold text-white small">Sedan</div>
+                                    <div class="text-warning fw-bold small">₹15/km</div>
+                                </div>
+                            </div>
+                            <!-- SUV Card -->
+                            <div class="col-4">
+                                <div class="cab-card text-center" data-cab="SUV" data-rate="20" onclick="selectCabType('SUV', 20, this)">
+                                    <span class="cab-badge mb-1 d-inline-block"><i class="fa-solid fa-user me-1"></i>6</span>
+                                    <div class="fw-bold text-white small">SUV</div>
+                                    <div class="text-warning fw-bold small">₹20/km</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Dynamic Fare Breakdown Box -->
+                    <div class="fare-box mb-4">
+                        <div class="d-flex justify-content-between small text-muted mb-1">
+                            <span>Base Fare</span>
+                            <span class="text-light">₹50</span>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted mb-1">
+                            <span>Distance</span>
+                            <span class="text-light" id="lblFareDistance">0.0 km</span>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted mb-2">
+                            <span>Rate (<span id="lblCabType">Sedan</span>)</span>
+                            <span class="text-light" id="lblFareRate">₹15/km</span>
+                        </div>
+                        <hr class="border-secondary my-2">
+                        <div class="d-flex justify-content-between fw-bold fs-5 text-white">
+                            <span>Total Estimated Fare</span>
+                            <span class="text-warning" id="lblTotalFare">₹50</span>
+                        </div>
+                    </div>
+
+                    <!-- 5. Payment Method Selector -->
+                    <div class="mb-4">
+                        <label class="form-label text-light fw-semibold mb-2">
+                            <i class="fa-solid fa-wallet text-info me-2"></i> Payment Method
+                        </label>
+                        <select class="form-select" id="paymentMethod">
+                            <option value="Cash" selected>💵 Cash on Delivery</option>
+                            <option value="UPI">📱 UPI / QR Code</option>
+                            <option value="Card">💳 Credit / Debit Card</option>
+                        </select>
+                    </div>
+
+                    <!-- Error Feedback Banner -->
+                    <div id="bookingAlert" class="alert alert-danger d-none py-2 px-3 small border-0 mb-3" role="alert"></div>
+
+                    <!-- 6. Book Cab Action Button -->
+                    <button type="button" class="btn btn-cabgo-primary w-100 py-3 fs-5 pulse-animation" id="btnBookCab">
+                        <i class="fa-solid fa-taxi me-2"></i> Book Cab Now
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'bookings/js/maps.js' %}"></script>
+<script src="{% static 'bookings/js/booking.js' %}"></script>
+{% endblock %}
